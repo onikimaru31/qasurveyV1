@@ -581,7 +581,7 @@ async function connectJsonBin() {
     const res = await fetch(`${JSONBIN_BASE}/b`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json', 'X-Master-Key': key, 'X-Bin-Name': 'qa360_responses', 'X-Bin-Private': 'false' },
-      body: JSON.stringify({ responses: [] })
+      body: JSON.stringify({ responses: [], surveys: {} })
     });
     const data = await res.json();
     if (!res.ok) throw new Error(data.message || 'Failed');
@@ -881,9 +881,17 @@ function renderQuestions() {
 }
 
 // ═══════════════════════════════════════════════════════════════════════
-//  SURVEYS  — links embed full payload in hash
+//  SURVEYS  — short links via JSONBin, 3-day expiry
 // ═══════════════════════════════════════════════════════════════════════
 let lastCreatedSurveyId = null;
+
+const LINK_TTL_DAYS = 3;
+const LINK_TTL_MS   = LINK_TTL_DAYS * 24 * 60 * 60 * 1000;
+
+// Generate a short 8-char alphanumeric code
+function shortCode() {
+  return Math.random().toString(36).slice(2,6) + Math.random().toString(36).slice(2,6);
+}
 
 function populateSurveyLeadSelect() {
   const sel = document.getElementById('survey-lead-id');
@@ -894,71 +902,176 @@ function populateSurveyLeadSelect() {
   document.getElementById('survey-modal-msg').innerHTML = '';
 }
 
+// Build the full payload object stored in cloud
 function buildPayload(sv) {
   const lead = store.leads.find(l=>l.id===sv.leadId);
   return {
-    token: sv.token, surveyId: sv.id, leadId: sv.leadId,
-    leadName: lead?lead.name:'', leadTeam: lead?lead.team:'',
-    assessorName: sv.assessorName, assessorPosition: sv.assessorPosition,
-    createdAt: sv.createdAt, questions: store.questions,
-    // embed cloud config so assessor can push response directly
-    cloudBinId: cloudCfg ? cloudCfg.binId : null,
-    cloudApiKey: cloudCfg ? cloudCfg.apiKey : null
+    token:           sv.token,
+    code:            sv.code,
+    surveyId:        sv.id,
+    leadId:          sv.leadId,
+    leadName:        lead ? lead.name : '',
+    leadTeam:        lead ? lead.team : '',
+    assessorName:    sv.assessorName,
+    assessorPosition:sv.assessorPosition,
+    createdAt:       sv.createdAt,
+    expiresAt:       sv.expiresAt,
+    questions:       store.questions,
+    cloudBinId:      cloudCfg ? cloudCfg.binId  : null,
+    cloudApiKey:     cloudCfg ? cloudCfg.apiKey : null
   };
 }
-function buildHashUrl(sv) {
+
+// Short URL:  <base>#s/<8-char-code>.<binId>
+// binId embedded so any external user can fetch payload (public read, no key needed)
+function buildShortUrl(sv) {
+  const base = window.location.href.split('?')[0].split('#')[0];
+  const binPart = cloudCfg ? '.' + cloudCfg.binId : '';
+  return base + '#s/' + sv.code + binPart;
+}
+
+// Upload payload to cloud under key surveys/<code>
+async function uploadSurveyPayload(sv) {
+  if (!cloudCfg) return false;
+  try {
+    const payload = buildPayload(sv);
+    const getRes  = await fetch(`https://api.jsonbin.io/v3/b/${cloudCfg.binId}/latest`,
+      { headers: { 'X-Master-Key': cloudCfg.apiKey, 'X-Bin-Meta': 'false' } });
+    const raw    = await getRes.json();
+    const record = raw.record !== undefined ? raw.record : raw;
+    if (!record.surveys) record.surveys = {};
+    record.surveys[sv.code] = payload;
+    const putRes = await fetch(`https://api.jsonbin.io/v3/b/${cloudCfg.binId}`,
+      { method:'PUT', headers:{ 'Content-Type':'application/json','X-Master-Key':cloudCfg.apiKey },
+        body: JSON.stringify(record) });
+    return putRes.ok;
+  } catch(e) { console.warn('[QA360] uploadSurveyPayload failed:', e); return false; }
+}
+
+// Fetch a payload from cloud by short code
+async function fetchSurveyPayload(code) {
+  if (!cloudCfg) return null;
+  try {
+    const res  = await fetch(`https://api.jsonbin.io/v3/b/${cloudCfg.binId}/latest`,
+      { headers: { 'X-Master-Key': cloudCfg.apiKey, 'X-Bin-Meta': 'false' } });
+    const raw  = await res.json();
+    const record = raw.record !== undefined ? raw.record : raw;
+    return (record.surveys && record.surveys[code]) || null;
+  } catch(e) { return null; }
+}
+
+async function createSurveyLink() {
+  const leadId      = parseInt(document.getElementById('survey-lead-id').value);
+  const assessorName= document.getElementById('assessor-name').value.trim();
+  const assessorPos = document.getElementById('assessor-position').value.trim();
+  if (!leadId)       return showModalMsg('Please select a QA Lead.', 'red');
+  if (!assessorName) return showModalMsg("Please enter the assessor's name.", 'red');
+  if (!assessorPos)  return showModalMsg("Please enter the assessor's position.", 'red');
+
+  const btn = document.querySelector('#modal-send-survey .btn-primary');
+  btn.disabled = true;
+  btn.innerHTML = '<span class="spinner"></span> Generating…';
+
+  const token     = 'sv_' + Date.now() + '_' + Math.random().toString(36).slice(2,8);
+  const code      = shortCode();                           // 8-char short code
+  const createdAt = new Date().toISOString();
+  const expiresAt = new Date(Date.now() + LINK_TTL_MS).toISOString();
+
+  const survey = { id:store.nextId.survey++, leadId, assessorName, assessorPosition:assessorPos,
+                   token, code, status:'pending', createdAt, expiresAt };
+  store.surveys.push(survey);
+  saveStore();
+  lastCreatedSurveyId = survey.id;
+
+  // Try to upload payload to cloud (enables short URL)
+  let cloudOk = false;
+  if (cloudCfg) {
+    cloudOk = await uploadSurveyPayload(survey);
+  }
+
+  closeModal('modal-send-survey');
+  btn.disabled = false;
+  btn.textContent = 'Generate Link';
+
+  const url = cloudOk ? buildShortUrl(survey) : buildFallbackUrl(survey);
+  document.getElementById('generated-link-text').textContent = url;
+
+  const expiry = new Date(expiresAt).toLocaleDateString('en-GB', { day:'numeric', month:'short', year:'numeric' });
+  document.getElementById('cloud-link-note').innerHTML = cloudOk
+    ? `☁️ Short link active · Expires <strong>${expiry}</strong> (${LINK_TTL_DAYS} days)`
+    : `⚠️ Cloud not set up — using long link. <a href="#" onclick="openModal('modal-setup');return false">Set up cloud →</a>`;
+
+  openModal('modal-link-display');
+  renderSurveys();
+}
+
+// Fallback: embed full payload in hash (long URL, no cloud needed)
+function buildFallbackUrl(sv) {
   const encoded = btoa(unescape(encodeURIComponent(JSON.stringify(buildPayload(sv)))));
   const base = window.location.href.split('?')[0].split('#')[0];
   return base + '#survey/' + encoded;
 }
 
-function createSurveyLink() {
-  const leadId = parseInt(document.getElementById('survey-lead-id').value);
-  const assessorName = document.getElementById('assessor-name').value.trim();
-  const assessorPos = document.getElementById('assessor-position').value.trim();
-  if (!leadId) return showModalMsg('Please select a QA Lead.', 'red');
-  if (!assessorName) return showModalMsg("Please enter the assessor's name.", 'red');
-  if (!assessorPos) return showModalMsg("Please enter the assessor's position.", 'red');
-  const token = 'sv_' + Date.now() + '_' + Math.random().toString(36).slice(2,8);
-  const survey = { id:store.nextId.survey++, leadId, assessorName, assessorPosition:assessorPos, token, status:'pending', createdAt:new Date().toISOString() };
-  store.surveys.push(survey); saveStore();
-  lastCreatedSurveyId = survey.id;
-  closeModal('modal-send-survey');
-  const url = buildHashUrl(survey);
-  document.getElementById('generated-link-text').textContent = url;
-  document.getElementById('cloud-link-note').textContent = cloudCfg
-    ? '☁️ Cloud sync is active — responses will reach you automatically.'
-    : '⚠️ Cloud sync not set up. Go to Dashboard and click "Set up now" so responses reach you.';
-  openModal('modal-link-display');
-  renderSurveys();
+function showModalMsg(msg,type) {
+  document.getElementById('survey-modal-msg').innerHTML=`<div class="alert alert-${type==='red'?'red':'green'}">${msg}</div>`;
 }
-function showModalMsg(msg,type) { document.getElementById('survey-modal-msg').innerHTML=`<div class="alert alert-${type==='red'?'red':'green'}">${msg}</div>`; }
 function copyLink() {
   const text = document.getElementById('generated-link-text').textContent;
-  navigator.clipboard.writeText(text).then(()=>{ document.getElementById('copy-msg').style.display='block'; setTimeout(()=>document.getElementById('copy-msg').style.display='none',2000); });
+  navigator.clipboard.writeText(text).then(()=>{
+    document.getElementById('copy-msg').style.display='block';
+    setTimeout(()=>document.getElementById('copy-msg').style.display='none',2000);
+  });
 }
 function deleteSurveyLink(id) {
   if (!confirm('Remove this survey link?')) return;
   store.surveys = store.surveys.filter(s=>s.id!==id); saveStore(); renderSurveys();
 }
+
+function isExpired(sv) {
+  if (!sv.expiresAt) return false;
+  return Date.now() > new Date(sv.expiresAt).getTime();
+}
+
+function daysLeft(sv) {
+  if (!sv.expiresAt) return null;
+  const ms = new Date(sv.expiresAt).getTime() - Date.now();
+  if (ms <= 0) return 0;
+  return Math.ceil(ms / (1000 * 60 * 60 * 24));
+}
+
 function renderSurveys() {
   const tbody = document.getElementById('surveys-table-body');
-  if (!store.surveys.length) { tbody.innerHTML='<tr><td colspan="7" style="text-align:center;color:var(--text3);padding:2rem">No survey links created yet.</td></tr>'; return; }
+  if (!store.surveys.length) {
+    tbody.innerHTML='<tr><td colspan="7" style="text-align:center;color:var(--text3);padding:2rem">No survey links created yet.</td></tr>';
+    return;
+  }
   tbody.innerHTML = [...store.surveys].reverse().map(sv => {
     const lead = store.leads.find(l=>l.id===sv.leadId);
-    const statusBadge = sv.status==='completed'
-      ? '<span class="badge badge-green">✓ Completed</span>'
-      : '<span class="badge badge-warn">⏳ Pending</span>';
-    const url = buildHashUrl(sv);
-    return `<tr>
+    const expired   = isExpired(sv);
+    const left      = daysLeft(sv);
+    const url = sv.code && cloudCfg ? buildShortUrl(sv) : buildFallbackUrl(sv);
+
+    let statusBadge;
+    if (sv.status === 'completed') {
+      statusBadge = '<span class="badge badge-green">✓ Completed</span>';
+    } else if (expired) {
+      statusBadge = '<span class="badge badge-red">⛔ Expired</span>';
+    } else {
+      const warn = left <= 1 ? 'badge-red' : left <= 2 ? 'badge-warn' : 'badge-warn';
+      statusBadge = `<span class="badge ${warn}">⏳ ${left}d left</span>`;
+    }
+
+    const copyBtn = (!expired && sv.status !== 'completed')
+      ? `<button class="btn btn-outline btn-sm" onclick="(()=>{navigator.clipboard.writeText(${JSON.stringify(url)});this.textContent='✓ Copied';setTimeout(()=>this.textContent='Copy',2000)}).call(this)">Copy</button>`
+      : '';
+
+    return `<tr style="${expired?'opacity:0.55':''}">
       <td><strong>${lead?lead.name:'Deleted Lead'}</strong></td>
       <td>${sv.assessorName}</td>
       <td><span class="badge badge-gray">${sv.assessorPosition}</span></td>
       <td>${statusBadge}</td>
       <td style="font-size:0.78rem;color:var(--text3)">${new Date(sv.createdAt).toLocaleDateString()}</td>
-      <td>
-        <button class="btn btn-outline btn-sm" onclick="(()=>{navigator.clipboard.writeText(${JSON.stringify(url)});this.textContent='✓ Copied';setTimeout(()=>this.textContent='Copy Link',2000)}).call(this)">Copy Link</button>
-      </td>
+      <td>${copyBtn} ${sv.code ? `<span class="badge badge-blue" style="font-family:'DM Mono',monospace;font-size:0.72rem">#s/${sv.code}</span>` : ''}</td>
       <td><button class="btn btn-danger btn-sm" onclick="deleteSurveyLink(${sv.id})">Delete</button></td>
     </tr>`;
   }).join('');
@@ -1119,29 +1232,83 @@ function renderReportDetail() {
 }
 
 // ═══════════════════════════════════════════════════════════════════════
-//  SURVEY FILL PAGE  (runs when hash = #survey/<encoded>)
+//  SURVEY FILL PAGE
 // ═══════════════════════════════════════════════════════════════════════
-function checkSurveyRoute() {
+async function checkSurveyRoute() {
   const hash = window.location.hash;
-  if (!hash.startsWith('#survey/')) return;
+  const isShort = hash.startsWith('#s/');
+  const isLong  = hash.startsWith('#survey/');
+  if (!isShort && !isLong) return;
 
-  let payload;
-  try {
-    const encoded = hash.slice('#survey/'.length);
-    payload = JSON.parse(decodeURIComponent(escape(atob(encoded))));
-  } catch(e) {
-    showSurveyError('❌', 'Invalid Link', 'This link is corrupted. Please ask the admin to generate a new one.');
-    return;
-  }
-
+  // Show survey shell immediately
   document.getElementById('auth-screen').style.display = 'none';
   document.getElementById('app').style.display = 'none';
   document.getElementById('survey-page').style.display = 'flex';
+  document.getElementById('survey-content').innerHTML = `<div class="survey-complete"><div class="icon" style="animation:spin 1s linear infinite;display:inline-block">⏳</div><p style="margin-top:1rem;color:var(--text3)">Loading survey…</p></div>`;
 
-  // Already submitted? (check local flag)
+  let payload = null;
+
+  if (isShort) {
+    // ── Short link format: #s/<code>.<binId> ──
+    const raw   = hash.slice('#s/'.length);
+    const dotI  = raw.indexOf('.');
+    const code  = dotI > 0 ? raw.slice(0, dotI) : raw;
+    const binId = dotI > 0 ? raw.slice(dotI + 1) : (cloudCfg ? cloudCfg.binId : null);
+
+    // Try local store first (admin on same device)
+    const localSv = store.surveys.find(s => s.code === code);
+    if (localSv) {
+      payload = buildPayload(localSv);
+    } else if (binId) {
+      // Fetch from cloud — try with key if available, then without (public bin)
+      try {
+        const headers = { 'X-Bin-Meta': 'false' };
+        if (cloudCfg && cloudCfg.apiKey) headers['X-Master-Key'] = cloudCfg.apiKey;
+        const res = await fetch(`https://api.jsonbin.io/v3/b/${binId}/latest`, { headers });
+        if (res.ok) {
+          const raw2   = await res.json();
+          const record = raw2.record !== undefined ? raw2.record : raw2;
+          payload = (record.surveys && record.surveys[code]) || null;
+        }
+      } catch(e) { console.warn('[QA360] Short link fetch error:', e); }
+    }
+
+    if (!payload) {
+      showSurveyError('❌', 'Link Not Found',
+        'This survey link could not be loaded. It may have expired or cloud is not reachable. Please ask the admin to resend the link.');
+      return;
+    }
+  } else {
+    // ── Long fallback link: decode from base64 ──
+    try {
+      const encoded = hash.slice('#survey/'.length);
+      payload = JSON.parse(decodeURIComponent(escape(atob(encoded))));
+    } catch(e) {
+      showSurveyError('❌', 'Invalid Link', 'This link is corrupted. Please ask the admin to generate a new one.');
+      return;
+    }
+  }
+
+  // ── Expiry check ──
+  if (payload.expiresAt && Date.now() > new Date(payload.expiresAt).getTime()) {
+    const expDate = new Date(payload.expiresAt).toLocaleDateString('en-GB', {day:'numeric',month:'short',year:'numeric'});
+    showSurveyError('⛔', 'Link Expired', `This survey link expired on ${expDate}. Please ask the admin to generate a new link.`);
+    return;
+  }
+
+  // ── Already submitted check ──
   if (localStorage.getItem('qa360_done_' + payload.token) === '1') {
     showSurveyError('✅', 'Already Submitted', 'You have already completed this assessment. Thank you!');
     return;
+  }
+
+  // ── Expiry countdown banner ──
+  let expiryBanner = '';
+  if (payload.expiresAt) {
+    const left = Math.ceil((new Date(payload.expiresAt).getTime() - Date.now()) / 86400000);
+    expiryBanner = `<div style="background:${left<=1?'var(--danger-light)':'var(--yellow-light)'};border:1px solid ${left<=1?'#E0B0B0':'#E0C800'};border-radius:8px;padding:8px 14px;font-size:0.8rem;color:${left<=1?'var(--danger)':'var(--yellow-dark)'};margin-bottom:1rem">
+      ⏰ This link expires in <strong>${left} day${left!==1?'s':''}</strong>
+    </div>`;
   }
 
   document.getElementById('survey-header-title').textContent = `QA Lead Evaluation: ${payload.leadName}`;
@@ -1161,6 +1328,7 @@ function checkSurveyRoute() {
   }).join('');
 
   document.getElementById('survey-content').innerHTML = `
+    ${expiryBanner}
     <div class="survey-info-card">
       <div class="lead-avatar">${initials(payload.leadName)}</div>
       <div>
