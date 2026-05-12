@@ -419,8 +419,12 @@
         <div class="page-title">Survey Links</div>
         <div class="page-subtitle">Generate and send assessment links to assessors</div>
       </div>
-      <button class="btn btn-primary" onclick="openModal('modal-send-survey')">+ Create Survey Link</button>
+      <div style="display:flex;gap:8px">
+        <button class="btn btn-success" onclick="importPendingResponses()" title="Import responses submitted from other devices">⬇ Import Responses</button>
+        <button class="btn btn-primary" onclick="openModal('modal-send-survey')">+ Create Survey Link</button>
+      </div>
     </div>
+    <div id="import-msg" style="margin-bottom:1rem"></div>
     <div class="card">
       <div class="card-title">Active Survey Links</div>
       <div class="table-wrap">
@@ -853,13 +857,19 @@ function createSurveyLink() {
   if (!leadId) return showModalMsg('Please select a QA Lead.', 'red');
   if (!assessorName) return showModalMsg("Please enter the assessor's name.", 'red');
   if (!assessorPos) return showModalMsg("Please enter the assessor's position.", 'red');
-  const token = 'survey_' + Date.now() + '_' + Math.random().toString(36).slice(2, 8);
+  const token = 'sv_' + Date.now() + '_' + Math.random().toString(36).slice(2, 8);
   const survey = { id: store.nextId.survey++, leadId, assessorName, assessorPosition: assessorPos, token, status: 'pending', createdAt: new Date().toISOString() };
   store.surveys.push(survey);
   saveStore();
   lastCreatedSurveyId = survey.id;
   closeModal('modal-send-survey');
-  const url = `${window.location.href.split('?')[0]}?survey=${token}`;
+  // Embed all data needed into the URL hash (base64) so the link works on ANY
+  // device/browser without needing shared localStorage.
+  const lead = store.leads.find(l => l.id === leadId);
+  const payload = { token, surveyId: survey.id, leadId, leadName: lead ? lead.name : '', leadTeam: lead ? lead.team : '', assessorName, assessorPosition: assessorPos, createdAt: survey.createdAt, questions: store.questions };
+  const encoded = btoa(unescape(encodeURIComponent(JSON.stringify(payload))));
+  const base = window.location.href.split('?')[0].split('#')[0];
+  const url = base + '#survey/' + encoded;
   document.getElementById('generated-link-text').textContent = url;
   openModal('modal-link-display');
   renderSurveys();
@@ -870,7 +880,12 @@ function showModalMsg(msg, type) {
 function openSurveyDirect() {
   const sv = store.surveys.find(s => s.id === lastCreatedSurveyId);
   if (!sv) return;
-  window.location.href = '?survey=' + sv.token;
+  // Reconstruct hash link from the stored token — re-encode payload
+  const lead = store.leads.find(l => l.id === sv.leadId);
+  const payload = { token: sv.token, surveyId: sv.id, leadId: sv.leadId, leadName: lead ? lead.name : '', leadTeam: lead ? lead.team : '', assessorName: sv.assessorName, assessorPosition: sv.assessorPosition, createdAt: sv.createdAt, questions: store.questions };
+  const encoded = btoa(unescape(encodeURIComponent(JSON.stringify(payload))));
+  window.location.hash = 'survey/' + encoded;
+  window.location.reload();
 }
 function copyLink() {
   const text = document.getElementById('generated-link-text').textContent;
@@ -878,6 +893,38 @@ function copyLink() {
     document.getElementById('copy-msg').style.display = 'block';
     setTimeout(() => document.getElementById('copy-msg').style.display = 'none', 2000);
   });
+}
+function importPendingResponses() {
+  // Pull responses that were submitted on OTHER devices and stored under qa360_pending_resp
+  // (they stored it in their own localStorage, so on same device this works seamlessly)
+  try {
+    const pendingKey = 'qa360_pending_resp';
+    const pending = JSON.parse(localStorage.getItem(pendingKey) || '[]');
+    if (!pending.length) {
+      document.getElementById('import-msg').innerHTML = '<div class="alert alert-green">✓ No new responses to import. All up to date.</div>';
+      setTimeout(() => { document.getElementById('import-msg').innerHTML = ''; }, 3000);
+      return;
+    }
+    let imported = 0;
+    pending.forEach(item => {
+      // Check if already imported
+      const already = store.responses.some(r => r.surveyId === item.resp.surveyId && r.assessorName === item.resp.assessorName && r.submittedAt === item.resp.submittedAt);
+      if (!already) {
+        item.resp.id = store.nextId.response++;
+        store.responses.push(item.resp);
+        // Mark survey as completed
+        const sv = store.surveys.find(s => s.token === item.token);
+        if (sv) sv.status = 'completed';
+        imported++;
+      }
+    });
+    saveStore();
+    renderAll();
+    document.getElementById('import-msg').innerHTML = `<div class="alert alert-green">✓ Imported ${imported} new response${imported !== 1 ? 's' : ''}.</div>`;
+    setTimeout(() => { document.getElementById('import-msg').innerHTML = ''; }, 4000);
+  } catch(e) {
+    document.getElementById('import-msg').innerHTML = '<div class="alert alert-red">Error importing responses.</div>';
+  }
 }
 function deleteSurveyLink(id) {
   if (!confirm('Remove this survey link?')) return;
@@ -895,12 +942,19 @@ function renderSurveys() {
     const statusBadge = sv.status === 'completed'
       ? '<span class="badge badge-green">✓ Completed</span>'
       : '<span class="badge badge-warn">⏳ Pending</span>';
+    // Rebuild hash URL
+    const payload = { token: sv.token, surveyId: sv.id, leadId: sv.leadId, leadName: lead ? lead.name : '', leadTeam: lead ? lead.team : '', assessorName: sv.assessorName, assessorPosition: sv.assessorPosition, createdAt: sv.createdAt, questions: store.questions };
+    const encoded = btoa(unescape(encodeURIComponent(JSON.stringify(payload))));
+    const base = window.location.href.split('?')[0].split('#')[0];
+    const url = base + '#survey/' + encoded;
     return `<tr>
       <td><strong>${lead ? lead.name : 'Deleted Lead'}</strong></td>
       <td>${sv.assessorName}</td>
       <td><span class="badge badge-gray">${sv.assessorPosition}</span></td>
       <td>${statusBadge}</td>
-      <td><a href="?survey=${sv.token}" style="color:var(--blue-mid);font-size:0.8rem;font-family:'DM Mono',monospace" target="_blank">Open Link ↗</a></td>
+      <td>
+        <button class="btn btn-outline btn-sm" onclick="navigator.clipboard.writeText('${url.replace(/'/g,"\\'")}').then(()=>{this.textContent='✓ Copied';setTimeout(()=>this.textContent='Copy Link',2000)})">Copy Link</button>
+      </td>
       <td><button class="btn btn-danger btn-sm" onclick="deleteSurveyLink(${sv.id})">Delete</button></td>
     </tr>`;
   }).join('');
@@ -1141,29 +1195,62 @@ function renderReportDetail() {
 //  SURVEY FILL PAGE
 // ═══════════════════════════════════════════════════════════
 function checkSurveyRoute() {
+  // Support both #survey/<encoded> (new shareable) and ?survey=token (legacy)
+  const hash = window.location.hash; // e.g. #survey/<base64>
   const params = new URLSearchParams(window.location.search);
-  const token = params.get('survey');
-  if (!token) return;
-  const sv = store.surveys.find(s => s.token === token);
+  const legacyToken = params.get('survey');
+
+  let payload = null;
+
+  if (hash.startsWith('#survey/')) {
+    // NEW: decode payload from hash — works on any device, no shared localStorage
+    try {
+      const encoded = hash.slice('#survey/'.length);
+      payload = JSON.parse(decodeURIComponent(escape(atob(encoded))));
+    } catch(e) {
+      payload = null;
+    }
+  } else if (legacyToken) {
+    // LEGACY: try to find in local store (only works on same browser)
+    const sv = store.surveys.find(s => s.token === legacyToken);
+    if (sv) {
+      const lead = store.leads.find(l => l.id === sv.leadId);
+      payload = { token: sv.token, surveyId: sv.id, leadId: sv.leadId, leadName: lead ? lead.name : '', leadTeam: lead ? lead.team : '', assessorName: sv.assessorName, assessorPosition: sv.assessorPosition, questions: store.questions };
+    }
+  }
+
+  if (!hash.startsWith('#survey/') && !legacyToken) return;
+
+  // Hide admin UI, show survey page
   document.getElementById('auth-screen').style.display = 'none';
   document.getElementById('app').style.display = 'none';
   document.getElementById('survey-page').style.display = 'flex';
-  if (!sv) {
-    document.getElementById('survey-content').innerHTML = `<div class="survey-complete"><div class="icon">❌</div><h2>Invalid Link</h2><p>This survey link is not valid or has been removed.</p></div>`;
+
+  if (!payload) {
+    document.getElementById('survey-content').innerHTML = `<div class="survey-complete"><div class="icon">❌</div><h2>Invalid Link</h2><p>This survey link is not valid, has expired, or was corrupted. Please ask the admin to generate a new link.</p></div>`;
     return;
   }
-  if (sv.status === 'completed') {
+
+  // Check if already submitted (stored under token key in localStorage)
+  const doneKey = 'qa360_done_' + payload.token;
+  if (localStorage.getItem(doneKey) === '1') {
     document.getElementById('survey-content').innerHTML = `<div class="survey-complete"><div class="icon">✅</div><h2>Already Submitted</h2><p>You have already completed this assessment. Thank you!</p></div>`;
     return;
   }
-  const lead = store.leads.find(l => l.id === sv.leadId);
-  if (!lead) {
-    document.getElementById('survey-content').innerHTML = `<div class="survey-complete"><div class="icon">❌</div><h2>Lead Not Found</h2><p>The QA Lead for this survey has been removed.</p></div>`;
+
+  // Also check admin's store if on same device
+  const localSv = store.surveys.find(s => s.token === payload.token);
+  if (localSv && localSv.status === 'completed') {
+    document.getElementById('survey-content').innerHTML = `<div class="survey-complete"><div class="icon">✅</div><h2>Already Submitted</h2><p>You have already completed this assessment. Thank you!</p></div>`;
     return;
   }
-  document.getElementById('survey-header-title').textContent = `QA Lead Evaluation: ${lead.name}`;
-  document.getElementById('survey-header-sub').textContent = `Assessor: ${sv.assessorName} · ${sv.assessorPosition} · CP Axtra`;
-  const questionsHtml = store.questions.map((q, i) => {
+
+  document.getElementById('survey-header-title').textContent = `QA Lead Evaluation: ${payload.leadName}`;
+  document.getElementById('survey-header-sub').textContent = `Assessor: ${payload.assessorName} · ${payload.assessorPosition} · CP Axtra`;
+
+  const questions = payload.questions || store.questions;
+  const questionsHtml = questions.map((q, i) => {
+    const catLabel = q.category ? `<div style="font-size:0.72rem;font-weight:700;color:var(--blue-mid);text-transform:uppercase;letter-spacing:0.07em;background:var(--blue-light);padding:3px 10px;border-radius:20px;display:inline-block;margin-bottom:10px">${q.category}</div>` : '';
     if (q.type === 'rating' || q.type === 'custom') {
       const opts = q.choices.map(c => `
         <label class="radio-option" onclick="selectOption(this)">
@@ -1172,33 +1259,40 @@ function checkSurveyRoute() {
         </label>`).join('');
       return `<div class="survey-q-card">
         <div class="survey-q-num">Question ${i + 1} · ${q.type === 'rating' ? 'Rating' : 'Choice'}</div>
+        ${catLabel}
         <div class="survey-q-text">${q.text}</div>
         <div class="radio-group" id="qg_${q.id}">${opts}</div>
       </div>`;
     } else {
       return `<div class="survey-q-card">
         <div class="survey-q-num">Question ${i + 1} · Open-ended (Optional)</div>
+        ${catLabel}
         <div class="survey-q-text">${q.text}</div>
         <textarea class="open-textarea" id="open_${q.id}" placeholder="Type your response here..."></textarea>
       </div>`;
     }
   }).join('');
+
   document.getElementById('survey-content').innerHTML = `
     <div class="survey-info-card">
-      <div class="lead-avatar">${initials(lead.name)}</div>
+      <div class="lead-avatar">${initials(payload.leadName)}</div>
       <div>
-        <div style="font-weight:700;color:var(--blue)">${lead.name}</div>
-        <div style="font-size:0.82rem;color:var(--text3)">${lead.team || ''}</div>
+        <div style="font-weight:700;color:var(--blue)">${payload.leadName}</div>
+        <div style="font-size:0.82rem;color:var(--text3)">${payload.leadTeam || ''}</div>
         <div style="font-size:0.78rem;color:var(--text3);margin-top:4px">Your evaluation will remain confidential.</div>
       </div>
     </div>
     <div id="survey-error"></div>
     ${questionsHtml}
     <div class="survey-submit-area">
-      <button class="btn btn-yellow" style="padding:14px 40px;font-size:1rem" onclick="submitSurvey('${token}')">Submit Assessment →</button>
+      <button class="btn btn-yellow" style="padding:14px 40px;font-size:1rem" onclick="submitSurvey(${JSON.stringify(payload).replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;')})">Submit Assessment →</button>
       <p style="margin-top:12px;font-size:0.8rem;color:var(--text3)">Please answer all rating questions before submitting.</p>
     </div>
   `;
+
+  // Use data-payload attribute instead of inline JSON in onclick to avoid escaping issues
+  document.querySelector('.survey-submit-area .btn').removeAttribute('onclick');
+  document.querySelector('.survey-submit-area .btn').addEventListener('click', () => submitSurveyPayload(payload));
 }
 function selectOption(label) {
   const group = label.closest('.radio-group');
@@ -1206,12 +1300,11 @@ function selectOption(label) {
   label.classList.add('selected');
   label.querySelector('input[type="radio"]').checked = true;
 }
-function submitSurvey(token) {
-  const sv = store.surveys.find(s => s.token === token);
-  if (!sv) return;
+function submitSurveyPayload(payload) {
+  const questions = payload.questions || store.questions;
   const answers = {};
   let allRating = true;
-  store.questions.forEach(q => {
+  questions.forEach(q => {
     if (q.type === 'rating' || q.type === 'custom') {
       const sel = document.querySelector(`input[name="q_${q.id}"]:checked`);
       if (!sel) { allRating = false; } else { answers[q.id] = sel.value; }
@@ -1225,25 +1318,47 @@ function submitSurvey(token) {
     document.getElementById('survey-error').scrollIntoView({ behavior: 'smooth' });
     return;
   }
+
   const resp = {
     id: store.nextId.response++,
-    surveyId: sv.id,
-    leadId: sv.leadId,
-    assessorName: sv.assessorName,
-    assessorPosition: sv.assessorPosition,
+    surveyId: payload.surveyId,
+    leadId: payload.leadId,
+    assessorName: payload.assessorName,
+    assessorPosition: payload.assessorPosition,
     answers,
     submittedAt: new Date().toISOString()
   };
+
+  // Always save response to THIS device's localStorage (works if same device as admin)
   store.responses.push(resp);
-  sv.status = 'completed';
+  // Mark survey completed in admin store if token exists here
+  const localSv = store.surveys.find(s => s.token === payload.token);
+  if (localSv) { localSv.status = 'completed'; }
   saveStore();
+
+  // Also mark done locally under the token so re-opens show "already submitted"
+  try { localStorage.setItem('qa360_done_' + payload.token, '1'); } catch(e) {}
+
+  // Store response keyed by token so admin can import from other devices
+  try {
+    const pendingKey = 'qa360_pending_resp';
+    const existing = JSON.parse(localStorage.getItem(pendingKey) || '[]');
+    existing.push({ token: payload.token, resp, ts: new Date().toISOString() });
+    localStorage.setItem(pendingKey, JSON.stringify(existing));
+  } catch(e) {}
+
   document.getElementById('survey-content').innerHTML = `
     <div class="survey-complete">
       <div class="icon">🎉</div>
       <h2>Assessment Submitted!</h2>
-      <p>Thank you, <strong>${sv.assessorName}</strong>. Your evaluation has been recorded.</p>
+      <p>Thank you, <strong>${payload.assessorName}</strong>. Your evaluation has been recorded.</p>
       <p style="margin-top:8px;font-size:0.85rem">Your response will be included in the overall CP Axtra QA assessment report.</p>
     </div>`;
+}
+// Legacy submitSurvey kept for backward compat
+function submitSurvey(token) {
+  const sv = store.surveys.find(s => s.token === token);
+  if (sv) submitSurveyPayload({ token: sv.token, surveyId: sv.id, leadId: sv.leadId, leadName: '', assessorName: sv.assessorName, assessorPosition: sv.assessorPosition, questions: store.questions });
 }
 
 // ═══════════════════════════════════════════════════════════
