@@ -6,48 +6,17 @@
 <title>QA Lead 360° Assessment — CP Axtra</title>
 <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;500;600;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
 <style>
-  /* ══════════════════════════════════════════════
-     CP AXTRA BRAND PALETTE
-     Primary Blue  : #003B7A  (deep navy blue)
-     Active Blue   : #0057A8  (mid blue)
-     Light Blue    : #E6EEF8  (tint)
-     Primary Yellow: #FFD000  (CP Axtra gold-yellow)
-     Yellow Hover  : #E6BB00
-     Yellow Light  : #FFFBE6
-     ══════════════════════════════════════════════ */
   :root {
-    --bg: #F2F4F8;
-    --surface: #FFFFFF;
-    --surface2: #EEF2F8;
-    --border: #D6DDE8;
-    --border2: #B0BBD0;
-    --text: #0D1C2E;
-    --text2: #3A4E68;
-    --text3: #7A8FA8;
-
-    --blue: #003B7A;
-    --blue-mid: #0057A8;
-    --blue-light: #E6EEF8;
-    --blue-hover: #002D60;
-
-    --yellow: #FFD000;
-    --yellow-hover: #E6BB00;
-    --yellow-light: #FFFBE6;
-    --yellow-dark: #7A5E00;
-
-    --accent: var(--blue);
-    --accent-light: var(--blue-light);
-    --accent2: #1A7A40;
-    --accent2-light: #E6F5EE;
-
-    --warn: #7A4A00;
-    --warn-light: #FFF4E0;
-    --danger: #7A1A1A;
-    --danger-light: #FDF0F0;
-    --success: #1A5C2E;
-    --success-light: #E8F5EF;
-    --radius: 10px;
-    --radius-sm: 6px;
+    --bg: #F2F4F8; --surface: #FFFFFF; --surface2: #EEF2F8;
+    --border: #D6DDE8; --border2: #B0BBD0;
+    --text: #0D1C2E; --text2: #3A4E68; --text3: #7A8FA8;
+    --blue: #003B7A; --blue-mid: #0057A8; --blue-light: #E6EEF8; --blue-hover: #002D60;
+    --yellow: #FFD000; --yellow-hover: #E6BB00; --yellow-light: #FFFBE6; --yellow-dark: #7A5E00;
+    --accent2: #1A7A40; --accent2-light: #E6F5EE;
+    --warn: #7A4A00; --warn-light: #FFF4E0;
+    --danger: #7A1A1A; --danger-light: #FDF0F0;
+    --success: #1A5C2E; --success-light: #E8F5EF;
+    --radius: 10px; --radius-sm: 6px;
     --shadow: 0 1px 4px rgba(0,40,100,0.08);
   }
   * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -60,8 +29,7 @@
   }
   .auth-box {
     background: var(--surface); border-radius: 18px; padding: 2.5rem; width: 390px;
-    box-shadow: 0 24px 64px rgba(0,30,80,0.35);
-    border-top: 5px solid var(--yellow);
+    box-shadow: 0 24px 64px rgba(0,30,80,0.35); border-top: 5px solid var(--yellow);
   }
   .auth-logo { text-align: center; margin-bottom: 2rem; }
   .auth-logo .logo-icon {
@@ -92,7 +60,7 @@
   }
   .btn-primary { background: var(--blue); color: #fff; }
   .btn-primary:hover { background: var(--blue-hover); }
-  .btn-yellow { background: var(--yellow); color: var(--blue); border: none; }
+  .btn-yellow { background: var(--yellow); color: var(--blue); }
   .btn-yellow:hover { background: var(--yellow-hover); }
   .btn-success { background: var(--accent2); color: #fff; }
   .btn-success:hover { background: #145E30; }
@@ -100,23 +68,18 @@
   .btn-outline:hover { background: var(--surface2); }
   .btn-danger { background: transparent; color: var(--danger); border: 1.5px solid #E0B0B0; }
   .btn-danger:hover { background: var(--danger-light); }
-  .btn-warn { background: transparent; color: var(--warn); border: 1.5px solid #E0C0A0; }
-  .btn-warn:hover { background: var(--warn-light); }
   .btn-full { width: 100%; justify-content: center; padding: 13px; font-size: 0.98rem; }
   .btn-sm { padding: 6px 12px; font-size: 0.8rem; }
+  .btn:disabled { opacity: 0.5; cursor: not-allowed; }
 
   /* ── APP SHELL ── */
   #app { display: none; min-height: 100vh; flex-direction: column; }
-
   .topbar {
     height: 58px; background: var(--blue); display: flex; align-items: center;
     padding: 0 1.5rem; gap: 1rem; position: sticky; top: 0; z-index: 100;
     border-bottom: 3px solid var(--yellow);
   }
-  .topbar .brand {
-    color: #fff; font-size: 0.95rem; font-weight: 700;
-    display: flex; align-items: center; gap: 10px;
-  }
+  .topbar .brand { color: #fff; font-size: 0.95rem; font-weight: 700; display: flex; align-items: center; gap: 10px; }
   .topbar .brand .yellow-pill {
     background: var(--yellow); color: var(--blue); font-size: 0.68rem; font-weight: 800;
     padding: 2px 8px; border-radius: 20px; letter-spacing: 0.06em; text-transform: uppercase;
@@ -129,12 +92,36 @@
   }
   .topbar-nav button:hover { background: rgba(255,255,255,0.12); color: #fff; }
   .topbar-nav button.active { background: var(--yellow); color: var(--blue); }
+  .sync-indicator {
+    display: flex; align-items: center; gap: 6px;
+    font-size: 0.78rem; color: rgba(255,255,255,0.7);
+    padding: 4px 10px; border-radius: 20px;
+    border: 1px solid rgba(255,255,255,0.2);
+    cursor: pointer; transition: all 0.2s;
+  }
+  .sync-indicator:hover { background: rgba(255,255,255,0.1); color: #fff; }
+  .sync-dot { width: 8px; height: 8px; border-radius: 50%; background: #888; flex-shrink: 0; }
+  .sync-dot.connected { background: #4ADE80; }
+  .sync-dot.syncing { background: var(--yellow); animation: pulse 1s infinite; }
+  .sync-dot.error { background: #f87171; }
+  @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.3} }
   .logout-btn {
-    margin-left: 1rem; padding: 6px 14px; background: rgba(255,255,255,0.1);
+    margin-left: 0.5rem; padding: 6px 14px; background: rgba(255,255,255,0.1);
     border: 1px solid rgba(255,255,255,0.25); border-radius: 6px; color: #fff;
     font-family: inherit; font-size: 0.82rem; font-weight: 600; cursor: pointer;
   }
   .logout-btn:hover { background: rgba(255,255,255,0.2); }
+
+  /* ── SETUP BANNER ── */
+  .setup-banner {
+    background: var(--yellow-light); border: 1.5px solid var(--yellow); border-radius: var(--radius);
+    padding: 1rem 1.25rem; margin-bottom: 1.5rem;
+    display: flex; align-items: flex-start; gap: 1rem;
+  }
+  .setup-banner .icon { font-size: 1.5rem; flex-shrink: 0; margin-top: 2px; }
+  .setup-banner h4 { font-size: 0.9rem; font-weight: 700; color: var(--yellow-dark); margin-bottom: 4px; }
+  .setup-banner p { font-size: 0.82rem; color: var(--text2); line-height: 1.5; }
+  .setup-banner a { color: var(--blue-mid); font-weight: 600; }
 
   /* ── PAGES ── */
   .page { display: none; padding: 2rem; max-width: 1120px; margin: 0 auto; width: 100%; }
@@ -144,25 +131,19 @@
   .page-subtitle { font-size: 0.85rem; color: var(--text3); margin-top: 3px; }
 
   /* ── CARDS ── */
-  .card {
-    background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius);
-    padding: 1.25rem 1.5rem; box-shadow: var(--shadow);
-  }
+  .card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 1.25rem 1.5rem; box-shadow: var(--shadow); }
   .card-title {
     font-size: 0.82rem; font-weight: 700; margin-bottom: 1rem; color: var(--blue);
     text-transform: uppercase; letter-spacing: 0.07em;
-    padding-bottom: 8px; border-bottom: 2px solid var(--yellow);
-    display: inline-block;
+    padding-bottom: 8px; border-bottom: 2px solid var(--yellow); display: inline-block;
   }
   .grid-2 { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1rem; }
-  .grid-3 { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 1rem; }
   .grid-4 { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 1rem; }
 
   /* ── STAT CARDS ── */
   .stat-card {
     background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius);
-    padding: 1.25rem; text-align: center; border-top: 3px solid var(--yellow);
-    box-shadow: var(--shadow);
+    padding: 1.25rem; text-align: center; border-top: 3px solid var(--yellow); box-shadow: var(--shadow);
   }
   .stat-value { font-size: 2.3rem; font-weight: 700; color: var(--blue); line-height: 1; }
   .stat-label { font-size: 0.78rem; color: var(--text3); margin-top: 6px; font-weight: 500; }
@@ -170,20 +151,13 @@
   /* ── TABLES ── */
   .table-wrap { overflow-x: auto; }
   table { width: 100%; border-collapse: collapse; font-size: 0.875rem; }
-  th {
-    text-align: left; padding: 10px 14px; font-size: 0.72rem; font-weight: 700;
-    text-transform: uppercase; letter-spacing: 0.06em; color: var(--blue);
-    border-bottom: 2px solid var(--yellow); background: var(--blue-light);
-  }
+  th { text-align: left; padding: 10px 14px; font-size: 0.72rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.06em; color: var(--blue); border-bottom: 2px solid var(--yellow); background: var(--blue-light); }
   td { padding: 11px 14px; border-bottom: 1px solid var(--border); vertical-align: middle; }
   tr:last-child td { border-bottom: none; }
   tr:hover td { background: var(--blue-light); }
 
   /* ── BADGES ── */
-  .badge {
-    display: inline-flex; align-items: center; padding: 3px 10px; border-radius: 20px;
-    font-size: 0.74rem; font-weight: 600; gap: 4px;
-  }
+  .badge { display: inline-flex; align-items: center; padding: 3px 10px; border-radius: 20px; font-size: 0.74rem; font-weight: 600; gap: 4px; }
   .badge-blue { background: var(--blue-light); color: var(--blue); }
   .badge-yellow { background: var(--yellow-light); color: var(--yellow-dark); border: 1px solid #E0C800; }
   .badge-green { background: var(--success-light); color: var(--success); }
@@ -191,13 +165,11 @@
   .badge-red { background: var(--danger-light); color: var(--danger); }
   .badge-gray { background: var(--surface2); color: var(--text2); }
 
-  /* ── PROGRESS BAR ── */
+  /* ── PROGRESS ── */
   .progress-bar { background: var(--border); border-radius: 99px; height: 8px; overflow: hidden; }
   .progress-fill { height: 100%; border-radius: 99px; transition: width 0.5s ease; }
-  .fill-excellent { background: #1A7A40; }
-  .fill-good { background: #003B7A; }
-  .fill-average { background: #C08A00; }
-  .fill-poor { background: #A02020; }
+  .fill-excellent { background: #1A7A40; } .fill-good { background: #003B7A; }
+  .fill-average { background: #C08A00; } .fill-poor { background: #A02020; }
 
   /* ── QUESTION ITEM ── */
   .question-item {
@@ -205,75 +177,37 @@
     padding: 1.25rem; margin-bottom: 0.75rem; display: flex; gap: 1rem; align-items: flex-start;
     border-left: 4px solid var(--yellow);
   }
-  .question-num {
-    width: 30px; height: 30px; min-width: 30px; background: var(--blue); color: var(--yellow);
-    border-radius: 50%; display: flex; align-items: center; justify-content: center;
-    font-size: 0.75rem; font-weight: 700; margin-top: 2px;
-  }
+  .question-num { width: 30px; height: 30px; min-width: 30px; background: var(--blue); color: var(--yellow); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 0.75rem; font-weight: 700; margin-top: 2px; }
   .question-body { flex: 1; }
   .question-text { font-size: 0.9rem; font-weight: 500; margin-bottom: 6px; }
   .question-type { font-size: 0.78rem; color: var(--text3); }
 
   /* ── LEAD CARD ── */
-  .lead-card {
-    background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius);
-    padding: 1.25rem; display: flex; align-items: center; gap: 1rem;
-    box-shadow: var(--shadow);
-  }
-  .lead-avatar {
-    width: 46px; height: 46px; min-width: 46px; border-radius: 50%;
-    background: var(--blue); color: var(--yellow); display: flex; align-items: center;
-    justify-content: center; font-size: 1rem; font-weight: 700;
-    border: 2px solid var(--yellow);
-  }
+  .lead-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 1.25rem; display: flex; align-items: center; gap: 1rem; box-shadow: var(--shadow); }
+  .lead-avatar { width: 46px; height: 46px; min-width: 46px; border-radius: 50%; background: var(--blue); color: var(--yellow); display: flex; align-items: center; justify-content: center; font-size: 1rem; font-weight: 700; border: 2px solid var(--yellow); }
   .lead-info { flex: 1; }
   .lead-name { font-weight: 700; font-size: 0.95rem; color: var(--blue); }
   .lead-role { font-size: 0.8rem; color: var(--text3); }
 
   /* ── MODAL ── */
-  .modal-overlay {
-    position: fixed; inset: 0; background: rgba(0,20,60,0.5); z-index: 500;
-    display: none; align-items: center; justify-content: center; padding: 1rem;
-  }
+  .modal-overlay { position: fixed; inset: 0; background: rgba(0,20,60,0.5); z-index: 500; display: none; align-items: center; justify-content: center; padding: 1rem; }
   .modal-overlay.open { display: flex; }
-  .modal {
-    background: var(--surface); border-radius: 14px; padding: 2rem; width: 100%;
-    max-width: 520px; max-height: 90vh; overflow-y: auto;
-    box-shadow: 0 20px 60px rgba(0,30,80,0.25);
-    border-top: 4px solid var(--yellow);
-  }
+  .modal { background: var(--surface); border-radius: 14px; padding: 2rem; width: 100%; max-width: 520px; max-height: 90vh; overflow-y: auto; box-shadow: 0 20px 60px rgba(0,30,80,0.25); border-top: 4px solid var(--yellow); }
   .modal-title { font-size: 1.1rem; font-weight: 700; margin-bottom: 1.5rem; color: var(--blue); }
   .modal-actions { display: flex; gap: 0.75rem; justify-content: flex-end; margin-top: 1.5rem; }
 
   /* ── SURVEY PAGE ── */
-  #survey-page {
-    min-height: 100vh; background: var(--bg); padding: 0;
-    display: none; flex-direction: column;
-  }
-  .survey-header {
-    background: var(--blue); color: #fff; padding: 2rem;
-    text-align: center; border-bottom: 5px solid var(--yellow);
-  }
+  #survey-page { min-height: 100vh; background: var(--bg); padding: 0; display: none; flex-direction: column; }
+  .survey-header { background: var(--blue); color: #fff; padding: 2rem; text-align: center; border-bottom: 5px solid var(--yellow); }
   .survey-header h1 { font-size: 1.5rem; font-weight: 700; }
   .survey-header p { font-size: 0.9rem; opacity: 0.85; margin-top: 6px; }
   .survey-body { max-width: 680px; margin: 0 auto; padding: 2rem 1rem; }
-  .survey-info-card {
-    background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius);
-    padding: 1.25rem 1.5rem; margin-bottom: 1.5rem; display: flex; gap: 1rem; align-items: center;
-    border-left: 5px solid var(--yellow);
-  }
-  .survey-q-card {
-    background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius);
-    padding: 1.5rem; margin-bottom: 1rem; box-shadow: var(--shadow);
-  }
+  .survey-info-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 1.25rem 1.5rem; margin-bottom: 1.5rem; display: flex; gap: 1rem; align-items: center; border-left: 5px solid var(--yellow); }
+  .survey-q-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 1.5rem; margin-bottom: 1rem; box-shadow: var(--shadow); }
   .survey-q-num { font-size: 0.72rem; font-weight: 700; color: var(--blue); text-transform: uppercase; margin-bottom: 8px; letter-spacing: 0.07em; }
   .survey-q-text { font-size: 1rem; font-weight: 600; margin-bottom: 1.25rem; line-height: 1.6; color: var(--text); }
   .radio-group { display: flex; flex-direction: column; gap: 8px; }
-  .radio-option {
-    display: flex; align-items: center; gap: 10px; padding: 10px 14px;
-    border: 1.5px solid var(--border); border-radius: var(--radius-sm); cursor: pointer;
-    transition: all 0.15s; font-size: 0.9rem; user-select: none;
-  }
+  .radio-option { display: flex; align-items: center; gap: 10px; padding: 10px 14px; border: 1.5px solid var(--border); border-radius: var(--radius-sm); cursor: pointer; transition: all 0.15s; font-size: 0.9rem; user-select: none; }
   .radio-option:hover { border-color: var(--blue-mid); background: var(--blue-light); }
   .radio-option input[type="radio"] { accent-color: var(--blue); width: 16px; height: 16px; }
   .radio-option.selected { border-color: var(--blue); background: var(--blue-light); font-weight: 600; color: var(--blue); }
@@ -285,50 +219,29 @@
   .survey-complete h2 { font-size: 1.5rem; font-weight: 700; color: var(--blue); margin-bottom: 0.5rem; }
   .survey-complete p { color: var(--text2); }
 
-  /* ── ALERT ── */
+  /* ── ALERTS ── */
   .alert { padding: 12px 16px; border-radius: var(--radius-sm); font-size: 0.875rem; margin-bottom: 1rem; }
   .alert-red { background: var(--danger-light); color: var(--danger); border: 1px solid #E0B0B0; }
   .alert-green { background: var(--success-light); color: var(--success); border: 1px solid #A0D0B0; }
+  .alert-yellow { background: var(--yellow-light); color: var(--yellow-dark); border: 1px solid #E0C800; }
 
-  /* ── EMPTY STATE ── */
+  /* ── MISC ── */
   .empty-state { text-align: center; padding: 3rem 1rem; color: var(--text3); }
   .empty-state .icon { font-size: 2.5rem; margin-bottom: 0.75rem; }
   .empty-state p { font-size: 0.9rem; }
-
-  /* ── SCORE CIRCLE ── */
-  .score-circle {
-    width: 72px; height: 72px; border-radius: 50%; display: flex;
-    align-items: center; justify-content: center; flex-direction: column;
-    border: 3px solid; font-weight: 700;
-  }
-  .score-pct { font-size: 1.1rem; }
-  .score-lbl { font-size: 0.6rem; }
-
-  /* ── LINK BOX ── */
-  .link-box {
-    display: flex; gap: 8px; align-items: center; background: var(--blue-light);
-    border: 1px solid var(--border); border-radius: var(--radius-sm); padding: 8px 12px;
-    font-family: 'DM Mono', monospace; font-size: 0.78rem; color: var(--text2);
-    word-break: break-all; flex: 1;
-  }
-
-  /* ── TABS ── */
+  .score-circle { width: 72px; height: 72px; border-radius: 50%; display: flex; align-items: center; justify-content: center; flex-direction: column; border: 3px solid; font-weight: 700; }
+  .score-pct { font-size: 1.1rem; } .score-lbl { font-size: 0.6rem; }
+  .link-box { display: flex; gap: 8px; align-items: center; background: var(--blue-light); border: 1px solid var(--border); border-radius: var(--radius-sm); padding: 8px 12px; font-family: 'DM Mono', monospace; font-size: 0.78rem; color: var(--text2); word-break: break-all; flex: 1; }
   .tabs { display: flex; gap: 4px; border-bottom: 2px solid var(--yellow); margin-bottom: 1.5rem; }
-  .tab-btn {
-    padding: 9px 18px; border: none; background: transparent; font-family: inherit;
-    font-size: 0.875rem; font-weight: 600; cursor: pointer; color: var(--text3);
-    border-bottom: 3px solid transparent; margin-bottom: -2px; transition: all 0.15s;
-  }
+  .tab-btn { padding: 9px 18px; border: none; background: transparent; font-family: inherit; font-size: 0.875rem; font-weight: 600; cursor: pointer; color: var(--text3); border-bottom: 3px solid transparent; margin-bottom: -2px; transition: all 0.15s; }
   .tab-btn.active { color: var(--blue); border-bottom-color: var(--blue); background: var(--blue-light); border-radius: 6px 6px 0 0; }
   .tab-btn:hover { color: var(--blue); }
 
-  /* ── CHART ── */
-  .chart-container { position: relative; margin: 0 auto; }
+  /* ── SPINNER ── */
+  .spinner { display: inline-block; width: 14px; height: 14px; border: 2px solid rgba(255,255,255,0.4); border-top-color: #fff; border-radius: 50%; animation: spin 0.7s linear infinite; }
+  @keyframes spin { to { transform: rotate(360deg); } }
 
-  @media (max-width: 600px) {
-    .topbar-nav button span { display: none; }
-    .page { padding: 1rem; }
-  }
+  @media (max-width: 600px) { .topbar-nav button span { display: none; } .page { padding: 1rem; } }
 </style>
 </head>
 <body>
@@ -366,35 +279,29 @@
       <button onclick="showPage('surveys')" id="nav-surveys"><span>🔗</span> Surveys</button>
       <button onclick="showPage('reports')" id="nav-reports"><span>📈</span> Reports</button>
     </nav>
+    <div class="sync-indicator" onclick="syncNow()" title="Click to sync responses now">
+      <div class="sync-dot" id="sync-dot"></div>
+      <span id="sync-label">Not connected</span>
+    </div>
     <button class="logout-btn" onclick="doLogout()">Sign Out</button>
   </div>
 
   <!-- ── DASHBOARD ── -->
   <div class="page active" id="page-dashboard">
     <div class="page-header">
-      <div>
-        <div class="page-title">Dashboard</div>
-        <div class="page-subtitle">Overview of QA Lead assessment results</div>
-      </div>
+      <div><div class="page-title">Dashboard</div><div class="page-subtitle">Overview of QA Lead assessment results</div></div>
+      <button class="btn btn-success btn-sm" onclick="syncNow()" id="btn-sync-dash">🔄 Sync Responses</button>
     </div>
+    <div id="sync-setup-banner"></div>
     <div class="grid-4" style="margin-bottom:1.5rem" id="dash-stats"></div>
-    <div class="card" style="margin-bottom:1.5rem">
-      <div class="card-title">QA Lead Performance Overview</div>
-      <div id="dash-leads-overview"></div>
-    </div>
-    <div class="card">
-      <div class="card-title">Overall Team Assessment Score</div>
-      <div id="dash-team-score"></div>
-    </div>
+    <div class="card" style="margin-bottom:1.5rem"><div class="card-title">QA Lead Performance Overview</div><div id="dash-leads-overview"></div></div>
+    <div class="card"><div class="card-title">Overall Team Assessment Score</div><div id="dash-team-score"></div></div>
   </div>
 
   <!-- ── QA LEADS ── -->
   <div class="page" id="page-leads">
     <div class="page-header">
-      <div>
-        <div class="page-title">QA Leads</div>
-        <div class="page-subtitle">Manage the QA leads to be assessed</div>
-      </div>
+      <div><div class="page-title">QA Leads</div><div class="page-subtitle">Manage the QA leads to be assessed</div></div>
       <button class="btn btn-primary" onclick="openModal('modal-add-lead')">+ Add QA Lead</button>
     </div>
     <div class="grid-2" id="leads-grid"></div>
@@ -403,10 +310,7 @@
   <!-- ── QUESTIONS ── -->
   <div class="page" id="page-questions">
     <div class="page-header">
-      <div>
-        <div class="page-title">Survey Questions</div>
-        <div class="page-subtitle">Manage evaluation questions and choices</div>
-      </div>
+      <div><div class="page-title">Survey Questions</div><div class="page-subtitle">Manage evaluation questions and choices</div></div>
       <button class="btn btn-primary" onclick="openModal('modal-add-question')">+ Add Question</button>
     </div>
     <div id="questions-list"></div>
@@ -415,21 +319,19 @@
   <!-- ── SURVEYS ── -->
   <div class="page" id="page-surveys">
     <div class="page-header">
-      <div>
-        <div class="page-title">Survey Links</div>
-        <div class="page-subtitle">Generate and send assessment links to assessors</div>
-      </div>
+      <div><div class="page-title">Survey Links</div><div class="page-subtitle">Generate and send assessment links to assessors</div></div>
       <div style="display:flex;gap:8px">
-        <button class="btn btn-success" onclick="importPendingResponses()" title="Import responses submitted from other devices">⬇ Import Responses</button>
+        <button class="btn btn-success btn-sm" onclick="syncNow()" id="btn-sync-survey">🔄 Sync Now</button>
         <button class="btn btn-primary" onclick="openModal('modal-send-survey')">+ Create Survey Link</button>
       </div>
     </div>
-    <div id="import-msg" style="margin-bottom:1rem"></div>
+    <div id="sync-msg" style="margin-bottom:1rem"></div>
+    <div id="sync-setup-banner2"></div>
     <div class="card">
       <div class="card-title">Active Survey Links</div>
       <div class="table-wrap">
         <table>
-          <thead><tr><th>QA Lead</th><th>Assessor</th><th>Position</th><th>Status</th><th>Link</th><th>Actions</th></tr></thead>
+          <thead><tr><th>QA Lead</th><th>Assessor</th><th>Position</th><th>Status</th><th>Created</th><th>Link</th><th>Actions</th></tr></thead>
           <tbody id="surveys-table-body"></tbody>
         </table>
       </div>
@@ -439,10 +341,7 @@
   <!-- ── REPORTS ── -->
   <div class="page" id="page-reports">
     <div class="page-header">
-      <div>
-        <div class="page-title">Assessment Reports</div>
-        <div class="page-subtitle">Detailed results and comparison for all QA Leads</div>
-      </div>
+      <div><div class="page-title">Assessment Reports</div><div class="page-subtitle">Detailed results and comparison for all QA Leads</div></div>
     </div>
     <div class="tabs">
       <button class="tab-btn active" onclick="switchReportTab('summary')" id="rtab-summary">Summary</button>
@@ -461,13 +360,36 @@
     <h1 id="survey-header-title">QA Lead Evaluation</h1>
     <p id="survey-header-sub">360° Assessment Survey · CP Axtra</p>
   </div>
-  <div class="survey-body">
-    <div id="survey-content"></div>
+  <div class="survey-body"><div id="survey-content"></div></div>
+</div>
+
+<!-- ════════════════ SETUP MODAL ════════════════ -->
+<div class="modal-overlay" id="modal-setup">
+  <div class="modal" style="max-width:600px">
+    <div class="modal-title">☁️ Cloud Sync Setup</div>
+    <p style="font-size:0.875rem;color:var(--text2);margin-bottom:1.25rem;line-height:1.6">
+      To receive responses from external assessors, this app uses <strong>JSONBin.io</strong> as a free cloud relay.
+      It takes 2 minutes to set up — no server required.
+    </p>
+    <div style="background:var(--blue-light);border-radius:var(--radius);padding:1rem;margin-bottom:1.25rem;font-size:0.82rem;line-height:1.8;color:var(--text2)">
+      <strong style="color:var(--blue)">Steps:</strong><br>
+      1. Go to <a href="https://jsonbin.io" target="_blank" style="color:var(--blue-mid);font-weight:700">jsonbin.io</a> → Sign up free<br>
+      2. Click <strong>API Keys</strong> → copy your <strong>Master Key</strong> (starts with <code>$2b$</code>)<br>
+      3. Paste it below and click <strong>Connect</strong> — a bin will be created automatically
+    </div>
+    <div class="form-group">
+      <label>JSONBin Master Key</label>
+      <input type="text" id="setup-api-key" placeholder="$2b$10$xxxxxxxxxxxxxxxxxxxx" style="font-family:'DM Mono',monospace;font-size:0.82rem">
+    </div>
+    <div id="setup-msg"></div>
+    <div class="modal-actions">
+      <button class="btn btn-outline" onclick="closeModal('modal-setup')">Skip for now</button>
+      <button class="btn btn-primary" id="btn-connect" onclick="connectJsonBin()">Connect ☁️</button>
+    </div>
   </div>
 </div>
 
 <!-- ════════════════ MODALS ════════════════ -->
-<!-- Add Lead -->
 <div class="modal-overlay" id="modal-add-lead">
   <div class="modal">
     <div class="modal-title">Add QA Lead</div>
@@ -481,7 +403,6 @@
   </div>
 </div>
 
-<!-- Edit Lead -->
 <div class="modal-overlay" id="modal-edit-lead">
   <div class="modal">
     <div class="modal-title">Edit QA Lead</div>
@@ -496,10 +417,10 @@
   </div>
 </div>
 
-<!-- Add Question -->
 <div class="modal-overlay" id="modal-add-question">
   <div class="modal">
     <div class="modal-title">Add Question</div>
+    <div class="form-group"><label>Category / Dimension</label><input type="text" id="q-category" placeholder="e.g. Leadership & Ownership"></div>
     <div class="form-group"><label>Question Text</label><textarea id="q-text" placeholder="Enter the question..."></textarea></div>
     <div class="form-group">
       <label>Question Type</label>
@@ -510,7 +431,7 @@
       </select>
     </div>
     <div id="custom-choices-area" style="display:none">
-      <div class="form-group"><label>Choices (one per line, format: value|label)</label><textarea id="q-choices" placeholder="5|Strongly Agree&#10;4|Agree&#10;3|Neutral&#10;2|Disagree&#10;1|Strongly Disagree"></textarea></div>
+      <div class="form-group"><label>Choices (one per line: value|label)</label><textarea id="q-choices" placeholder="5|Strongly Agree&#10;1|Strongly Disagree"></textarea></div>
     </div>
     <div class="modal-actions">
       <button class="btn btn-outline" onclick="closeModal('modal-add-question')">Cancel</button>
@@ -519,11 +440,11 @@
   </div>
 </div>
 
-<!-- Edit Question -->
 <div class="modal-overlay" id="modal-edit-question">
   <div class="modal">
     <div class="modal-title">Edit Question</div>
     <input type="hidden" id="eq-id">
+    <div class="form-group"><label>Category / Dimension</label><input type="text" id="eq-category"></div>
     <div class="form-group"><label>Question Text</label><textarea id="eq-text"></textarea></div>
     <div class="form-group">
       <label>Question Type</label>
@@ -543,16 +464,12 @@
   </div>
 </div>
 
-<!-- Send Survey -->
 <div class="modal-overlay" id="modal-send-survey">
   <div class="modal">
     <div class="modal-title">Create Survey Link</div>
-    <div class="form-group">
-      <label>QA Lead to Assess</label>
-      <select id="survey-lead-id"></select>
-    </div>
+    <div class="form-group"><label>QA Lead to Assess</label><select id="survey-lead-id"></select></div>
     <div class="form-group"><label>Assessor Full Name</label><input type="text" id="assessor-name" placeholder="e.g. Wichai Thongchai"></div>
-    <div class="form-group"><label>Assessor Position / Role</label><input type="text" id="assessor-position" placeholder="e.g. Project Manager, Business Analyst, Developer"></div>
+    <div class="form-group"><label>Assessor Position / Role</label><input type="text" id="assessor-position" placeholder="e.g. Project Manager, Developer"></div>
     <div id="survey-modal-msg"></div>
     <div class="modal-actions">
       <button class="btn btn-outline" onclick="closeModal('modal-send-survey')">Cancel</button>
@@ -561,28 +478,30 @@
   </div>
 </div>
 
-<!-- Survey Link Display -->
 <div class="modal-overlay" id="modal-link-display">
   <div class="modal">
     <div class="modal-title">✅ Survey Link Generated</div>
-    <p style="font-size:0.875rem;color:var(--text2);margin-bottom:1rem;">Share this link with the assessor. They can open it in any browser to complete the evaluation.</p>
+    <p style="font-size:0.875rem;color:var(--text2);margin-bottom:1rem;">Share this link with the assessor. Works on any device or browser.</p>
     <div style="display:flex;gap:8px;align-items:center;margin-bottom:1rem">
       <div class="link-box" id="generated-link-text"></div>
       <button class="btn btn-outline btn-sm" onclick="copyLink()">Copy</button>
     </div>
     <div id="copy-msg" style="font-size:0.8rem;color:var(--success);display:none">✓ Copied to clipboard!</div>
+    <div id="cloud-link-note" style="font-size:0.8rem;color:var(--text3);margin-bottom:1rem"></div>
     <div class="modal-actions">
-      <button class="btn btn-yellow" onclick="closeModal('modal-link-display');openSurveyDirect()">Preview Survey</button>
       <button class="btn btn-outline" onclick="closeModal('modal-link-display')">Close</button>
     </div>
   </div>
 </div>
 
 <script>
-// ═══════════════════════════════════════════════════════════
-//  DATA STORE
-// ═══════════════════════════════════════════════════════════
+// ═══════════════════════════════════════════════════════════════════════
+//  CONSTANTS & DEFAULTS
+// ═══════════════════════════════════════════════════════════════════════
 const ADMIN_CREDS = { username: 'admin', password: 'admin123' };
+const JSONBIN_BASE = 'https://api.jsonbin.io/v3';
+const LS_KEY = 'qa360_cpaxtra_v4';
+const LS_CLOUD = 'qa360_cloud_cfg';
 
 const defaultChoices = [
   { value: 5, label: '5 – Strongly Agree' },
@@ -592,47 +511,198 @@ const defaultChoices = [
   { value: 1, label: '1 – Strongly Disagree' }
 ];
 
+// ═══════════════════════════════════════════════════════════════════════
+//  LOCAL STORE
+// ═══════════════════════════════════════════════════════════════════════
 let store = {
   questions: [
-    { id: 1, text: 'The QA Lead demonstrates strong ownership and accountability in managing testing activities and project support.', category: 'Leadership & Ownership', type: 'rating', choices: defaultChoices },
-    { id: 2, text: 'The QA Lead communicates clearly, professionally, and keeps stakeholders properly informed.', category: 'Communication Effectiveness', type: 'rating', choices: defaultChoices },
-    { id: 3, text: 'The QA Lead demonstrates strong understanding of business flows, system behavior, and testing strategy.', category: 'Knowledge & Understanding', type: 'rating', choices: defaultChoices },
-    { id: 4, text: 'The QA Lead proactively identifies risks, dependencies, and potential impacts, and escalates appropriately when needed.', category: 'Risk Awareness & Escalation', type: 'rating', choices: defaultChoices },
-    { id: 5, text: 'The QA Lead handles urgent tasks, incidents, and critical situations effectively under pressure.', category: 'Handling Urgent/Critical Situations', type: 'rating', choices: defaultChoices },
-    { id: 6, text: 'The QA Lead ensures appropriate testing quality and sufficient test coverage before release/UAT.', category: 'Quality of Testing Oversight', type: 'rating', choices: defaultChoices },
-    { id: 7, text: 'The QA Lead collaborates effectively with Business, Development, Infrastructure, and other related teams.', category: 'Coordination & Collaboration', type: 'rating', choices: defaultChoices },
-    { id: 8, text: 'The QA Lead manages testing timelines effectively while balancing quality and project priorities.', category: 'Timeline & Delivery Management', type: 'rating', choices: defaultChoices },
-    { id: 9, text: 'The QA Lead demonstrates effective decision-making and problem-solving during project execution.', category: 'Decision Making & Problem Solving', type: 'rating', choices: defaultChoices },
-    { id: 10, text: 'Overall, I am satisfied with the support and contribution provided by this QA Lead.', category: 'Overall Satisfaction', type: 'rating', choices: defaultChoices },
-    { id: 11, text: 'What does this QA Lead do particularly well?', category: 'Open-ended', type: 'open', choices: [] },
-    { id: 12, text: 'What areas could this QA Lead improve?', category: 'Open-ended', type: 'open', choices: [] },
-    { id: 13, text: 'Additional comments or suggestions', category: 'Open-ended', type: 'open', choices: [] }
+    { id:1,  category:'Leadership & Ownership',            type:'rating', choices:defaultChoices, text:'The QA Lead demonstrates strong ownership and accountability in managing testing activities and project support.' },
+    { id:2,  category:'Communication Effectiveness',       type:'rating', choices:defaultChoices, text:'The QA Lead communicates clearly, professionally, and keeps stakeholders properly informed.' },
+    { id:3,  category:'Knowledge & Understanding',         type:'rating', choices:defaultChoices, text:'The QA Lead demonstrates strong understanding of business flows, system behavior, and testing strategy.' },
+    { id:4,  category:'Risk Awareness & Escalation',       type:'rating', choices:defaultChoices, text:'The QA Lead proactively identifies risks, dependencies, and potential impacts, and escalates appropriately when needed.' },
+    { id:5,  category:'Handling Urgent/Critical Situations',type:'rating',choices:defaultChoices, text:'The QA Lead handles urgent tasks, incidents, and critical situations effectively under pressure.' },
+    { id:6,  category:'Quality of Testing Oversight',      type:'rating', choices:defaultChoices, text:'The QA Lead ensures appropriate testing quality and sufficient test coverage before release/UAT.' },
+    { id:7,  category:'Coordination & Collaboration',      type:'rating', choices:defaultChoices, text:'The QA Lead collaborates effectively with Business, Development, Infrastructure, and other related teams.' },
+    { id:8,  category:'Timeline & Delivery Management',    type:'rating', choices:defaultChoices, text:'The QA Lead manages testing timelines effectively while balancing quality and project priorities.' },
+    { id:9,  category:'Decision Making & Problem Solving', type:'rating', choices:defaultChoices, text:'The QA Lead demonstrates effective decision-making and problem-solving during project execution.' },
+    { id:10, category:'Overall Satisfaction',              type:'rating', choices:defaultChoices, text:'Overall, I am satisfied with the support and contribution provided by this QA Lead.' },
+    { id:11, category:'Open-ended', type:'open', choices:[], text:'What does this QA Lead do particularly well?' },
+    { id:12, category:'Open-ended', type:'open', choices:[], text:'What areas could this QA Lead improve?' },
+    { id:13, category:'Open-ended', type:'open', choices:[], text:'Additional comments or suggestions' }
   ],
   leads: [],
   surveys: [],
   responses: [],
-  nextId: { q: 14, lead: 1, survey: 1, response: 1 }
+  nextId: { q:14, lead:1, survey:1, response:1 }
 };
 
-function saveStore() { try { localStorage.setItem('qa360_cpaxtra_store', JSON.stringify(store)); } catch(e){} }
+// Cloud config: { apiKey, binId }
+let cloudCfg = null;
+
+function saveStore() {
+  try { localStorage.setItem(LS_KEY, JSON.stringify(store)); } catch(e){}
+}
 function loadStore() {
-  try {
-    const s = localStorage.getItem('qa360_cpaxtra_store');
-    if (s) store = JSON.parse(s);
-  } catch(e) {}
+  try { const s = localStorage.getItem(LS_KEY); if (s) store = JSON.parse(s); } catch(e){}
+  try { const c = localStorage.getItem(LS_CLOUD); if (c) cloudCfg = JSON.parse(c); } catch(e){}
 }
 loadStore();
 
-// ═══════════════════════════════════════════════════════════
+// ═══════════════════════════════════════════════════════════════════════
+//  CLOUD SYNC  (JSONBin.io)
+//  Each submission POSTs a response object to a shared bin.
+//  Admin polls the bin and merges new responses.
+// ═══════════════════════════════════════════════════════════════════════
+function saveCloudCfg() {
+  try { localStorage.setItem(LS_CLOUD, JSON.stringify(cloudCfg)); } catch(e){}
+}
+
+function setSyncStatus(status, label) {
+  const dot = document.getElementById('sync-dot');
+  const lbl = document.getElementById('sync-label');
+  if (!dot || !lbl) return;
+  dot.className = 'sync-dot ' + status;
+  lbl.textContent = label;
+}
+
+async function connectJsonBin() {
+  const key = document.getElementById('setup-api-key').value.trim();
+  if (!key) { document.getElementById('setup-msg').innerHTML = '<div class="alert alert-red">Please enter your API key.</div>'; return; }
+  const btn = document.getElementById('btn-connect');
+  btn.disabled = true;
+  btn.innerHTML = '<span class="spinner"></span> Connecting…';
+  document.getElementById('setup-msg').innerHTML = '';
+  try {
+    // Create a new bin named qa360_responses
+    const res = await fetch(`${JSONBIN_BASE}/b`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'X-Master-Key': key, 'X-Bin-Name': 'qa360_responses', 'X-Bin-Private': 'false' },
+      body: JSON.stringify({ responses: [] })
+    });
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.message || 'Failed');
+    cloudCfg = { apiKey: key, binId: data.metadata.id };
+    saveCloudCfg();
+    document.getElementById('setup-msg').innerHTML = `<div class="alert alert-green">✅ Connected! Bin ID: <code>${cloudCfg.binId}</code></div>`;
+    btn.disabled = false;
+    btn.textContent = 'Connected ✓';
+    setSyncStatus('connected', 'Cloud ready');
+    renderSetupBanners();
+    setTimeout(() => closeModal('modal-setup'), 1500);
+  } catch(e) {
+    document.getElementById('setup-msg').innerHTML = `<div class="alert alert-red">Error: ${e.message}. Check your API key.</div>`;
+    btn.disabled = false;
+    btn.textContent = 'Connect ☁️';
+  }
+}
+
+// Push a single response to the cloud bin
+async function pushResponseToCloud(resp) {
+  if (!cloudCfg) return;
+  try {
+    // Read current bin
+    const getRes = await fetch(`${JSONBIN_BASE}/b/${cloudCfg.binId}/latest`, {
+      headers: { 'X-Master-Key': cloudCfg.apiKey }
+    });
+    const getData = await getRes.json();
+    const current = getData.record || { responses: [] };
+    if (!Array.isArray(current.responses)) current.responses = [];
+    // Avoid duplicates
+    const exists = current.responses.some(r => r._uid === resp._uid);
+    if (!exists) current.responses.push(resp);
+    // Write back
+    await fetch(`${JSONBIN_BASE}/b/${cloudCfg.binId}`, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json', 'X-Master-Key': cloudCfg.apiKey },
+      body: JSON.stringify(current)
+    });
+  } catch(e) { console.warn('Cloud push failed:', e); }
+}
+
+// Pull all responses from cloud and merge into local store
+async function syncNow(silent) {
+  if (!cloudCfg) {
+    if (!silent) showSyncMsg('⚠️ Cloud not configured. Click the sync indicator to set up.', 'yellow');
+    return;
+  }
+  setSyncStatus('syncing', 'Syncing…');
+  try {
+    const res = await fetch(`${JSONBIN_BASE}/b/${cloudCfg.binId}/latest`, {
+      headers: { 'X-Master-Key': cloudCfg.apiKey }
+    });
+    if (!res.ok) throw new Error('Fetch failed');
+    const data = await res.json();
+    const cloudResponses = (data.record && data.record.responses) || [];
+    let newCount = 0;
+    cloudResponses.forEach(r => {
+      const exists = store.responses.some(lr => lr._uid === r._uid);
+      if (!exists) {
+        r.id = store.nextId.response++;
+        store.responses.push(r);
+        // Mark survey completed
+        const sv = store.surveys.find(s => s.token === r._token);
+        if (sv) sv.status = 'completed';
+        newCount++;
+      }
+    });
+    if (newCount > 0) {
+      saveStore();
+      renderAll();
+      if (!silent) showSyncMsg(`✅ Synced! ${newCount} new response${newCount>1?'s':''} received.`, 'green');
+    } else {
+      if (!silent) showSyncMsg('✓ Up to date. No new responses.', 'green');
+    }
+    setSyncStatus('connected', `Last sync: ${new Date().toLocaleTimeString()}`);
+  } catch(e) {
+    setSyncStatus('error', 'Sync failed');
+    if (!silent) showSyncMsg('❌ Sync failed. Check your connection or API key.', 'red');
+  }
+}
+
+function showSyncMsg(msg, type) {
+  const el = document.getElementById('sync-msg');
+  if (!el) return;
+  el.innerHTML = `<div class="alert alert-${type}">${msg}</div>`;
+  setTimeout(() => { el.innerHTML = ''; }, 5000);
+}
+
+function renderSetupBanners() {
+  const html = cloudCfg ? '' : `
+    <div class="setup-banner">
+      <div class="icon">☁️</div>
+      <div>
+        <h4>Cloud Sync Not Configured</h4>
+        <p>External assessors' responses won't reach you until you set up cloud sync.
+        It's free and takes 2 minutes. <a href="#" onclick="openModal('modal-setup');return false">Set up now →</a></p>
+      </div>
+    </div>`;
+  const b1 = document.getElementById('sync-setup-banner');
+  const b2 = document.getElementById('sync-setup-banner2');
+  if (b1) b1.innerHTML = html;
+  if (b2) b2.innerHTML = html;
+}
+
+// Auto-sync every 2 minutes when admin is logged in
+let syncInterval = null;
+function startAutoSync() {
+  if (syncInterval) clearInterval(syncInterval);
+  syncNow(true);
+  syncInterval = setInterval(() => syncNow(true), 120000);
+}
+
+// ═══════════════════════════════════════════════════════════════════════
 //  AUTH
-// ═══════════════════════════════════════════════════════════
+// ═══════════════════════════════════════════════════════════════════════
 function doLogin() {
   const u = document.getElementById('login-user').value.trim();
   const p = document.getElementById('login-pass').value;
   if (u === ADMIN_CREDS.username && p === ADMIN_CREDS.password) {
     document.getElementById('auth-screen').style.display = 'none';
     document.getElementById('app').style.display = 'flex';
+    setSyncStatus(cloudCfg ? 'connected' : 'error', cloudCfg ? 'Cloud ready' : 'Not connected');
     renderAll();
+    renderSetupBanners();
+    startAutoSync();
   } else {
     const el = document.getElementById('auth-error');
     el.textContent = 'Invalid username or password.';
@@ -643,36 +713,33 @@ document.getElementById('login-pass').addEventListener('keydown', e => { if (e.k
 document.getElementById('login-user').addEventListener('keydown', e => { if (e.key === 'Enter') doLogin(); });
 
 function doLogout() {
+  if (syncInterval) clearInterval(syncInterval);
   document.getElementById('app').style.display = 'none';
   document.getElementById('auth-screen').style.display = 'flex';
   document.getElementById('login-pass').value = '';
 }
 
-// ═══════════════════════════════════════════════════════════
+// ═══════════════════════════════════════════════════════════════════════
 //  NAVIGATION
-// ═══════════════════════════════════════════════════════════
+// ═══════════════════════════════════════════════════════════════════════
 function showPage(name) {
   document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
   document.querySelectorAll('.topbar-nav button').forEach(b => b.classList.remove('active'));
   document.getElementById('page-' + name).classList.add('active');
   document.getElementById('nav-' + name).classList.add('active');
-  if (name === 'dashboard') renderDashboard();
+  if (name === 'dashboard') { renderDashboard(); renderSetupBanners(); }
   if (name === 'leads') renderLeads();
   if (name === 'questions') renderQuestions();
-  if (name === 'surveys') renderSurveys();
+  if (name === 'surveys') { renderSurveys(); renderSetupBanners(); }
   if (name === 'reports') renderReports();
 }
+function renderAll() { renderDashboard(); renderLeads(); renderQuestions(); renderSurveys(); renderReports(); }
 
-function renderAll() {
-  renderDashboard(); renderLeads(); renderQuestions(); renderSurveys(); renderReports();
-}
-
-// ═══════════════════════════════════════════════════════════
+// ═══════════════════════════════════════════════════════════════════════
 //  MODAL HELPERS
-// ═══════════════════════════════════════════════════════════
+// ═══════════════════════════════════════════════════════════════════════
 function openModal(id) {
-  const m = document.getElementById(id);
-  m.classList.add('open');
+  document.getElementById(id).classList.add('open');
   if (id === 'modal-send-survey') populateSurveyLeadSelect();
 }
 function closeModal(id) { document.getElementById(id).classList.remove('open'); }
@@ -680,59 +747,49 @@ document.querySelectorAll('.modal-overlay').forEach(o => {
   o.addEventListener('click', e => { if (e.target === o) o.classList.remove('open'); });
 });
 
-// ═══════════════════════════════════════════════════════════
+// ═══════════════════════════════════════════════════════════════════════
 //  LEADS
-// ═══════════════════════════════════════════════════════════
-function initials(name) {
-  return name.split(' ').map(w => w[0]).slice(0, 2).join('').toUpperCase();
-}
+// ═══════════════════════════════════════════════════════════════════════
+function initials(name) { return (name||'?').split(' ').map(w=>w[0]).slice(0,2).join('').toUpperCase(); }
 function saveLead() {
   const name = document.getElementById('lead-name').value.trim();
   const team = document.getElementById('lead-team').value.trim();
   const email = document.getElementById('lead-email').value.trim();
   if (!name) return alert('Please enter a name.');
   store.leads.push({ id: store.nextId.lead++, name, team, email });
-  saveStore();
-  closeModal('modal-add-lead');
-  document.getElementById('lead-name').value = '';
-  document.getElementById('lead-team').value = '';
-  document.getElementById('lead-email').value = '';
+  saveStore(); closeModal('modal-add-lead');
+  ['lead-name','lead-team','lead-email'].forEach(id => document.getElementById(id).value = '');
   renderLeads(); renderDashboard();
 }
 function openEditLead(id) {
-  const lead = store.leads.find(l => l.id === id);
-  if (!lead) return;
+  const l = store.leads.find(x=>x.id===id); if(!l) return;
   document.getElementById('edit-lead-id').value = id;
-  document.getElementById('edit-lead-name').value = lead.name;
-  document.getElementById('edit-lead-team').value = lead.team;
-  document.getElementById('edit-lead-email').value = lead.email;
+  document.getElementById('edit-lead-name').value = l.name;
+  document.getElementById('edit-lead-team').value = l.team;
+  document.getElementById('edit-lead-email').value = l.email;
   openModal('modal-edit-lead');
 }
 function updateLead() {
   const id = parseInt(document.getElementById('edit-lead-id').value);
-  const lead = store.leads.find(l => l.id === id);
-  if (!lead) return;
-  lead.name = document.getElementById('edit-lead-name').value.trim();
-  lead.team = document.getElementById('edit-lead-team').value.trim();
-  lead.email = document.getElementById('edit-lead-email').value.trim();
+  const l = store.leads.find(x=>x.id===id); if(!l) return;
+  l.name = document.getElementById('edit-lead-name').value.trim();
+  l.team = document.getElementById('edit-lead-team').value.trim();
+  l.email = document.getElementById('edit-lead-email').value.trim();
   saveStore(); closeModal('modal-edit-lead'); renderLeads(); renderDashboard();
 }
 function deleteLead(id) {
   if (!confirm('Delete this QA Lead? All related surveys and responses will also be removed.')) return;
-  store.leads = store.leads.filter(l => l.id !== id);
-  store.surveys = store.surveys.filter(s => s.leadId !== id);
-  store.responses = store.responses.filter(r => r.leadId !== id);
+  store.leads = store.leads.filter(l=>l.id!==id);
+  store.surveys = store.surveys.filter(s=>s.leadId!==id);
+  store.responses = store.responses.filter(r=>r.leadId!==id);
   saveStore(); renderLeads(); renderSurveys(); renderDashboard(); renderReports();
 }
 function renderLeads() {
   const grid = document.getElementById('leads-grid');
-  if (!store.leads.length) {
-    grid.innerHTML = '<div class="empty-state"><div class="icon">👤</div><p>No QA Leads added yet. Click "Add QA Lead" to get started.</p></div>';
-    return;
-  }
+  if (!store.leads.length) { grid.innerHTML = '<div class="empty-state"><div class="icon">👤</div><p>No QA Leads added yet.</p></div>'; return; }
   grid.innerHTML = store.leads.map(lead => {
-    const responses = store.responses.filter(r => r.leadId === lead.id);
-    const surveyCount = store.surveys.filter(s => s.leadId === lead.id).length;
+    const responses = store.responses.filter(r=>r.leadId===lead.id);
+    const surveyCount = store.surveys.filter(s=>s.leadId===lead.id).length;
     const score = calcLeadScore(lead.id);
     const scoreHtml = score !== null
       ? `<div class="score-circle" style="border-color:${scoreColor(score)};color:${scoreColor(score)}"><span class="score-pct">${score}%</span><span class="score-lbl">score</span></div>`
@@ -741,7 +798,7 @@ function renderLeads() {
       <div class="lead-avatar">${initials(lead.name)}</div>
       <div class="lead-info">
         <div class="lead-name">${lead.name}</div>
-        <div class="lead-role">${lead.team || 'No team assigned'}</div>
+        <div class="lead-role">${lead.team||'No team assigned'}</div>
         <div style="margin-top:6px;display:flex;gap:6px;flex-wrap:wrap">
           <span class="badge badge-blue">${surveyCount} links sent</span>
           <span class="badge badge-green">${responses.length} completed</span>
@@ -756,78 +813,56 @@ function renderLeads() {
   }).join('');
 }
 
-// ═══════════════════════════════════════════════════════════
+// ═══════════════════════════════════════════════════════════════════════
 //  QUESTIONS
-// ═══════════════════════════════════════════════════════════
-function toggleChoicesEditor() {
-  document.getElementById('custom-choices-area').style.display =
-    document.getElementById('q-type').value === 'custom' ? 'block' : 'none';
-}
-function toggleEditChoicesEditor() {
-  document.getElementById('edit-custom-choices-area').style.display =
-    document.getElementById('eq-type').value === 'custom' ? 'block' : 'none';
-}
+// ═══════════════════════════════════════════════════════════════════════
+function toggleChoicesEditor() { document.getElementById('custom-choices-area').style.display = document.getElementById('q-type').value==='custom'?'block':'none'; }
+function toggleEditChoicesEditor() { document.getElementById('edit-custom-choices-area').style.display = document.getElementById('eq-type').value==='custom'?'block':'none'; }
+function parseChoices(raw) { return raw.split('\n').map(l=>{ const [v,...r]=l.split('|'); return {value:isNaN(v)?v:Number(v),label:r.join('|')||v}; }).filter(c=>c.label); }
 function saveQuestion() {
   const text = document.getElementById('q-text').value.trim();
+  const category = document.getElementById('q-category').value.trim();
   const type = document.getElementById('q-type').value;
   if (!text) return alert('Please enter question text.');
-  let choices = [];
-  if (type === 'rating') choices = defaultChoices;
-  if (type === 'custom') {
-    const raw = document.getElementById('q-choices').value.trim();
-    choices = raw.split('\n').map(l => { const [v, ...rest] = l.split('|'); return { value: isNaN(v) ? v : Number(v), label: rest.join('|') || v }; }).filter(c => c.label);
-  }
-  store.questions.push({ id: store.nextId.q++, text, category: text.substring(0, 40), type, choices });
+  let choices = type==='rating' ? defaultChoices : type==='custom' ? parseChoices(document.getElementById('q-choices').value.trim()) : [];
+  store.questions.push({ id:store.nextId.q++, text, category:category||text.substring(0,40), type, choices });
   saveStore(); closeModal('modal-add-question');
-  document.getElementById('q-text').value = '';
+  ['q-text','q-category'].forEach(id=>document.getElementById(id).value='');
   renderQuestions();
 }
 function openEditQuestion(id) {
-  const q = store.questions.find(q => q.id === id);
-  if (!q) return;
+  const q = store.questions.find(x=>x.id===id); if(!q) return;
   document.getElementById('eq-id').value = id;
+  document.getElementById('eq-category').value = q.category||'';
   document.getElementById('eq-text').value = q.text;
   document.getElementById('eq-type').value = q.type;
-  if (q.type === 'custom') {
-    document.getElementById('eq-choices').value = q.choices.map(c => `${c.value}|${c.label}`).join('\n');
-    document.getElementById('edit-custom-choices-area').style.display = 'block';
-  } else {
-    document.getElementById('edit-custom-choices-area').style.display = 'none';
-  }
+  document.getElementById('edit-custom-choices-area').style.display = q.type==='custom'?'block':'none';
+  if (q.type==='custom') document.getElementById('eq-choices').value = q.choices.map(c=>`${c.value}|${c.label}`).join('\n');
   openModal('modal-edit-question');
 }
 function updateQuestion() {
   const id = parseInt(document.getElementById('eq-id').value);
-  const q = store.questions.find(q => q.id === id);
-  if (!q) return;
+  const q = store.questions.find(x=>x.id===id); if(!q) return;
   q.text = document.getElementById('eq-text').value.trim();
+  q.category = document.getElementById('eq-category').value.trim()||q.category;
   q.type = document.getElementById('eq-type').value;
-  if (q.type === 'rating') q.choices = defaultChoices;
-  else if (q.type === 'custom') {
-    const raw = document.getElementById('eq-choices').value.trim();
-    q.choices = raw.split('\n').map(l => { const [v, ...rest] = l.split('|'); return { value: isNaN(v) ? v : Number(v), label: rest.join('|') || v }; }).filter(c => c.label);
-  } else { q.choices = []; }
+  q.choices = q.type==='rating' ? defaultChoices : q.type==='custom' ? parseChoices(document.getElementById('eq-choices').value.trim()) : [];
   saveStore(); closeModal('modal-edit-question'); renderQuestions();
 }
 function deleteQuestion(id) {
   if (!confirm('Delete this question?')) return;
-  store.questions = store.questions.filter(q => q.id !== id);
+  store.questions = store.questions.filter(q=>q.id!==id);
   saveStore(); renderQuestions();
 }
 function renderQuestions() {
   const list = document.getElementById('questions-list');
-  if (!store.questions.length) {
-    list.innerHTML = '<div class="empty-state"><div class="icon">📝</div><p>No questions yet.</p></div>';
-    return;
-  }
-  list.innerHTML = store.questions.map((q, i) => {
-    const typeLabel = q.type === 'rating' ? '⭐ Rating Scale (1–5)' : q.type === 'open' ? '📝 Open-ended' : '🔘 Custom Choices';
+  if (!store.questions.length) { list.innerHTML = '<div class="empty-state"><div class="icon">📝</div><p>No questions yet.</p></div>'; return; }
+  list.innerHTML = store.questions.map((q,i) => {
+    const typeLabel = q.type==='rating'?'⭐ Rating Scale (1–5)':q.type==='open'?'📝 Open-ended':'🔘 Custom Choices';
+    const catBadge = q.category?`<span style="font-size:0.72rem;font-weight:700;color:var(--blue-mid);background:var(--blue-light);padding:2px 8px;border-radius:12px;margin-bottom:5px;display:inline-block">${q.category}</span>`:'';
     return `<div class="question-item">
-      <div class="question-num">${i + 1}</div>
-      <div class="question-body">
-        <div class="question-text">${q.text}</div>
-        <div class="question-type">${typeLabel}</div>
-      </div>
+      <div class="question-num">${i+1}</div>
+      <div class="question-body">${catBadge}<div class="question-text">${q.text}</div><div class="question-type">${typeLabel}</div></div>
       <div style="display:flex;gap:6px;flex-shrink:0">
         <button class="btn btn-outline btn-sm" onclick="openEditQuestion(${q.id})">Edit</button>
         <button class="btn btn-danger btn-sm" onclick="deleteQuestion(${q.id})">Delete</button>
@@ -836,20 +871,38 @@ function renderQuestions() {
   }).join('');
 }
 
-// ═══════════════════════════════════════════════════════════
-//  SURVEYS
-// ═══════════════════════════════════════════════════════════
+// ═══════════════════════════════════════════════════════════════════════
+//  SURVEYS  — links embed full payload in hash
+// ═══════════════════════════════════════════════════════════════════════
 let lastCreatedSurveyId = null;
 
 function populateSurveyLeadSelect() {
   const sel = document.getElementById('survey-lead-id');
   sel.innerHTML = store.leads.length
-    ? store.leads.map(l => `<option value="${l.id}">${l.name} — ${l.team || 'No team'}</option>`).join('')
+    ? store.leads.map(l=>`<option value="${l.id}">${l.name} — ${l.team||'No team'}</option>`).join('')
     : '<option value="">No QA Leads added yet</option>';
-  document.getElementById('assessor-name').value = '';
-  document.getElementById('assessor-position').value = '';
+  ['assessor-name','assessor-position'].forEach(id=>document.getElementById(id).value='');
   document.getElementById('survey-modal-msg').innerHTML = '';
 }
+
+function buildPayload(sv) {
+  const lead = store.leads.find(l=>l.id===sv.leadId);
+  return {
+    token: sv.token, surveyId: sv.id, leadId: sv.leadId,
+    leadName: lead?lead.name:'', leadTeam: lead?lead.team:'',
+    assessorName: sv.assessorName, assessorPosition: sv.assessorPosition,
+    createdAt: sv.createdAt, questions: store.questions,
+    // embed cloud config so assessor can push response directly
+    cloudBinId: cloudCfg ? cloudCfg.binId : null,
+    cloudApiKey: cloudCfg ? cloudCfg.apiKey : null
+  };
+}
+function buildHashUrl(sv) {
+  const encoded = btoa(unescape(encodeURIComponent(JSON.stringify(buildPayload(sv)))));
+  const base = window.location.href.split('?')[0].split('#')[0];
+  return base + '#survey/' + encoded;
+}
+
 function createSurveyLink() {
   const leadId = parseInt(document.getElementById('survey-lead-id').value);
   const assessorName = document.getElementById('assessor-name').value.trim();
@@ -857,419 +910,235 @@ function createSurveyLink() {
   if (!leadId) return showModalMsg('Please select a QA Lead.', 'red');
   if (!assessorName) return showModalMsg("Please enter the assessor's name.", 'red');
   if (!assessorPos) return showModalMsg("Please enter the assessor's position.", 'red');
-  const token = 'sv_' + Date.now() + '_' + Math.random().toString(36).slice(2, 8);
-  const survey = { id: store.nextId.survey++, leadId, assessorName, assessorPosition: assessorPos, token, status: 'pending', createdAt: new Date().toISOString() };
-  store.surveys.push(survey);
-  saveStore();
+  const token = 'sv_' + Date.now() + '_' + Math.random().toString(36).slice(2,8);
+  const survey = { id:store.nextId.survey++, leadId, assessorName, assessorPosition:assessorPos, token, status:'pending', createdAt:new Date().toISOString() };
+  store.surveys.push(survey); saveStore();
   lastCreatedSurveyId = survey.id;
   closeModal('modal-send-survey');
-  // Embed all data needed into the URL hash (base64) so the link works on ANY
-  // device/browser without needing shared localStorage.
-  const lead = store.leads.find(l => l.id === leadId);
-  const payload = { token, surveyId: survey.id, leadId, leadName: lead ? lead.name : '', leadTeam: lead ? lead.team : '', assessorName, assessorPosition: assessorPos, createdAt: survey.createdAt, questions: store.questions };
-  const encoded = btoa(unescape(encodeURIComponent(JSON.stringify(payload))));
-  const base = window.location.href.split('?')[0].split('#')[0];
-  const url = base + '#survey/' + encoded;
+  const url = buildHashUrl(survey);
   document.getElementById('generated-link-text').textContent = url;
+  document.getElementById('cloud-link-note').textContent = cloudCfg
+    ? '☁️ Cloud sync is active — responses will reach you automatically.'
+    : '⚠️ Cloud sync not set up. Go to Dashboard and click "Set up now" so responses reach you.';
   openModal('modal-link-display');
   renderSurveys();
 }
-function showModalMsg(msg, type) {
-  document.getElementById('survey-modal-msg').innerHTML = `<div class="alert alert-${type === 'red' ? 'red' : 'green'}">${msg}</div>`;
-}
-function openSurveyDirect() {
-  const sv = store.surveys.find(s => s.id === lastCreatedSurveyId);
-  if (!sv) return;
-  // Reconstruct hash link from the stored token — re-encode payload
-  const lead = store.leads.find(l => l.id === sv.leadId);
-  const payload = { token: sv.token, surveyId: sv.id, leadId: sv.leadId, leadName: lead ? lead.name : '', leadTeam: lead ? lead.team : '', assessorName: sv.assessorName, assessorPosition: sv.assessorPosition, createdAt: sv.createdAt, questions: store.questions };
-  const encoded = btoa(unescape(encodeURIComponent(JSON.stringify(payload))));
-  window.location.hash = 'survey/' + encoded;
-  window.location.reload();
-}
+function showModalMsg(msg,type) { document.getElementById('survey-modal-msg').innerHTML=`<div class="alert alert-${type==='red'?'red':'green'}">${msg}</div>`; }
 function copyLink() {
   const text = document.getElementById('generated-link-text').textContent;
-  navigator.clipboard.writeText(text).then(() => {
-    document.getElementById('copy-msg').style.display = 'block';
-    setTimeout(() => document.getElementById('copy-msg').style.display = 'none', 2000);
-  });
-}
-function importPendingResponses() {
-  // Pull responses that were submitted on OTHER devices and stored under qa360_pending_resp
-  // (they stored it in their own localStorage, so on same device this works seamlessly)
-  try {
-    const pendingKey = 'qa360_pending_resp';
-    const pending = JSON.parse(localStorage.getItem(pendingKey) || '[]');
-    if (!pending.length) {
-      document.getElementById('import-msg').innerHTML = '<div class="alert alert-green">✓ No new responses to import. All up to date.</div>';
-      setTimeout(() => { document.getElementById('import-msg').innerHTML = ''; }, 3000);
-      return;
-    }
-    let imported = 0;
-    pending.forEach(item => {
-      // Check if already imported
-      const already = store.responses.some(r => r.surveyId === item.resp.surveyId && r.assessorName === item.resp.assessorName && r.submittedAt === item.resp.submittedAt);
-      if (!already) {
-        item.resp.id = store.nextId.response++;
-        store.responses.push(item.resp);
-        // Mark survey as completed
-        const sv = store.surveys.find(s => s.token === item.token);
-        if (sv) sv.status = 'completed';
-        imported++;
-      }
-    });
-    saveStore();
-    renderAll();
-    document.getElementById('import-msg').innerHTML = `<div class="alert alert-green">✓ Imported ${imported} new response${imported !== 1 ? 's' : ''}.</div>`;
-    setTimeout(() => { document.getElementById('import-msg').innerHTML = ''; }, 4000);
-  } catch(e) {
-    document.getElementById('import-msg').innerHTML = '<div class="alert alert-red">Error importing responses.</div>';
-  }
+  navigator.clipboard.writeText(text).then(()=>{ document.getElementById('copy-msg').style.display='block'; setTimeout(()=>document.getElementById('copy-msg').style.display='none',2000); });
 }
 function deleteSurveyLink(id) {
   if (!confirm('Remove this survey link?')) return;
-  store.surveys = store.surveys.filter(s => s.id !== id);
-  saveStore(); renderSurveys();
+  store.surveys = store.surveys.filter(s=>s.id!==id); saveStore(); renderSurveys();
 }
 function renderSurveys() {
   const tbody = document.getElementById('surveys-table-body');
-  if (!store.surveys.length) {
-    tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;color:var(--text3);padding:2rem">No survey links created yet.</td></tr>';
-    return;
-  }
-  tbody.innerHTML = store.surveys.map(sv => {
-    const lead = store.leads.find(l => l.id === sv.leadId);
-    const statusBadge = sv.status === 'completed'
+  if (!store.surveys.length) { tbody.innerHTML='<tr><td colspan="7" style="text-align:center;color:var(--text3);padding:2rem">No survey links created yet.</td></tr>'; return; }
+  tbody.innerHTML = [...store.surveys].reverse().map(sv => {
+    const lead = store.leads.find(l=>l.id===sv.leadId);
+    const statusBadge = sv.status==='completed'
       ? '<span class="badge badge-green">✓ Completed</span>'
       : '<span class="badge badge-warn">⏳ Pending</span>';
-    // Rebuild hash URL
-    const payload = { token: sv.token, surveyId: sv.id, leadId: sv.leadId, leadName: lead ? lead.name : '', leadTeam: lead ? lead.team : '', assessorName: sv.assessorName, assessorPosition: sv.assessorPosition, createdAt: sv.createdAt, questions: store.questions };
-    const encoded = btoa(unescape(encodeURIComponent(JSON.stringify(payload))));
-    const base = window.location.href.split('?')[0].split('#')[0];
-    const url = base + '#survey/' + encoded;
+    const url = buildHashUrl(sv);
     return `<tr>
-      <td><strong>${lead ? lead.name : 'Deleted Lead'}</strong></td>
+      <td><strong>${lead?lead.name:'Deleted Lead'}</strong></td>
       <td>${sv.assessorName}</td>
       <td><span class="badge badge-gray">${sv.assessorPosition}</span></td>
       <td>${statusBadge}</td>
+      <td style="font-size:0.78rem;color:var(--text3)">${new Date(sv.createdAt).toLocaleDateString()}</td>
       <td>
-        <button class="btn btn-outline btn-sm" onclick="navigator.clipboard.writeText('${url.replace(/'/g,"\\'")}').then(()=>{this.textContent='✓ Copied';setTimeout(()=>this.textContent='Copy Link',2000)})">Copy Link</button>
+        <button class="btn btn-outline btn-sm" onclick="(()=>{navigator.clipboard.writeText(${JSON.stringify(url)});this.textContent='✓ Copied';setTimeout(()=>this.textContent='Copy Link',2000)}).call(this)">Copy Link</button>
       </td>
       <td><button class="btn btn-danger btn-sm" onclick="deleteSurveyLink(${sv.id})">Delete</button></td>
     </tr>`;
   }).join('');
 }
 
-// ═══════════════════════════════════════════════════════════
+// ═══════════════════════════════════════════════════════════════════════
 //  SCORING
-// ═══════════════════════════════════════════════════════════
+// ═══════════════════════════════════════════════════════════════════════
 function calcLeadScore(leadId) {
-  const responses = store.responses.filter(r => r.leadId === leadId);
-  if (!responses.length) return null;
-  let total = 0, count = 0;
-  responses.forEach(resp => {
-    store.questions.filter(q => q.type === 'rating').forEach(q => {
-      const ans = resp.answers[q.id];
-      if (ans !== undefined && ans !== null) { total += Number(ans); count++; }
-    });
-  });
-  if (!count) return null;
-  return Math.round((total / (count * 5)) * 100);
+  const resps = store.responses.filter(r=>r.leadId===leadId);
+  if (!resps.length) return null;
+  let tot=0,cnt=0;
+  resps.forEach(r=>{ store.questions.filter(q=>q.type==='rating').forEach(q=>{ const a=r.answers[q.id]; if(a!=null){tot+=Number(a);cnt++;} }); });
+  return cnt ? Math.round((tot/(cnt*5))*100) : null;
 }
 function calcLeadScoreBreakdown(leadId) {
-  const responses = store.responses.filter(r => r.leadId === leadId);
-  if (!responses.length) return null;
-  const qScores = {};
-  store.questions.filter(q => q.type === 'rating').forEach(q => {
-    let tot = 0, cnt = 0;
-    responses.forEach(r => { const a = r.answers[q.id]; if (a !== undefined) { tot += Number(a); cnt++; } });
-    qScores[q.id] = cnt ? Math.round((tot / cnt / 5) * 100) : null;
+  const resps = store.responses.filter(r=>r.leadId===leadId);
+  if (!resps.length) return null;
+  const out={};
+  store.questions.filter(q=>q.type==='rating').forEach(q=>{
+    let t=0,c=0;
+    resps.forEach(r=>{ const a=r.answers[q.id]; if(a!=null){t+=Number(a);c++;} });
+    out[q.id] = c ? Math.round((t/c/5)*100) : null;
   });
-  return qScores;
+  return out;
 }
-function scoreColor(pct) {
-  if (pct >= 80) return '#1A7A40';
-  if (pct >= 60) return '#003B7A';
-  if (pct >= 40) return '#C08A00';
-  return '#A02020';
-}
-function scoreLabel(pct) {
-  if (pct >= 80) return 'Excellent';
-  if (pct >= 60) return 'Good';
-  if (pct >= 40) return 'Average';
-  return 'Needs Improvement';
-}
-function fillClass(pct) {
-  if (pct >= 80) return 'fill-excellent';
-  if (pct >= 60) return 'fill-good';
-  if (pct >= 40) return 'fill-average';
-  return 'fill-poor';
-}
+function scoreColor(p){ return p>=80?'#1A7A40':p>=60?'#003B7A':p>=40?'#C08A00':'#A02020'; }
+function scoreLabel(p){ return p>=80?'Excellent':p>=60?'Good':p>=40?'Average':'Needs Improvement'; }
+function fillClass(p){ return p>=80?'fill-excellent':p>=60?'fill-good':p>=40?'fill-average':'fill-poor'; }
 
-// ═══════════════════════════════════════════════════════════
+// ═══════════════════════════════════════════════════════════════════════
 //  DASHBOARD
-// ═══════════════════════════════════════════════════════════
+// ═══════════════════════════════════════════════════════════════════════
 function renderDashboard() {
-  const completedResponses = store.responses.length;
-  const pendingSurveys = store.surveys.filter(s => s.status === 'pending').length;
-  const leadsWithData = store.leads.filter(l => store.responses.some(r => r.leadId === l.id)).length;
-  const scores = store.leads.map(l => calcLeadScore(l.id)).filter(s => s !== null);
-  const teamScore = scores.length ? Math.round(scores.reduce((a, b) => a + b, 0) / scores.length) : null;
-
+  const completed = store.responses.length;
+  const pending = store.surveys.filter(s=>s.status==='pending').length;
+  const withData = store.leads.filter(l=>store.responses.some(r=>r.leadId===l.id)).length;
+  const scores = store.leads.map(l=>calcLeadScore(l.id)).filter(s=>s!==null);
+  const teamScore = scores.length ? Math.round(scores.reduce((a,b)=>a+b,0)/scores.length) : null;
   document.getElementById('dash-stats').innerHTML = `
-    <div class="stat-card"><div class="stat-value">${store.leads.length}</div><div class="stat-label">QA Leads Registered</div></div>
-    <div class="stat-card"><div class="stat-value">${store.surveys.length}</div><div class="stat-label">Survey Links Sent</div></div>
-    <div class="stat-card"><div class="stat-value">${completedResponses}</div><div class="stat-label">Assessments Completed</div></div>
-    <div class="stat-card"><div class="stat-value" style="color:${teamScore !== null ? scoreColor(teamScore) : 'var(--text3)'}">${teamScore !== null ? teamScore + '%' : 'N/A'}</div><div class="stat-label">Overall Team Score</div></div>
-  `;
-
-  const leadsHtml = store.leads.length ? store.leads.map(lead => {
+    <div class="stat-card"><div class="stat-value">${store.leads.length}</div><div class="stat-label">QA Leads</div></div>
+    <div class="stat-card"><div class="stat-value">${store.surveys.length}</div><div class="stat-label">Links Sent</div></div>
+    <div class="stat-card"><div class="stat-value">${completed}</div><div class="stat-label">Completed</div></div>
+    <div class="stat-card"><div class="stat-value" style="color:${teamScore!==null?scoreColor(teamScore):'var(--text3)'}">${teamScore!==null?teamScore+'%':'N/A'}</div><div class="stat-label">Team Score</div></div>`;
+  const leadsHtml = store.leads.length ? store.leads.map(lead=>{
     const score = calcLeadScore(lead.id);
-    const responses = store.responses.filter(r => r.leadId === lead.id).length;
+    const cnt = store.responses.filter(r=>r.leadId===lead.id).length;
     return `<div style="display:flex;align-items:center;gap:1rem;padding:12px 0;border-bottom:1px solid var(--border)">
       <div class="lead-avatar" style="width:36px;height:36px;min-width:36px;font-size:0.82rem">${initials(lead.name)}</div>
-      <div style="flex:1;min-width:0">
-        <div style="font-weight:700;font-size:0.9rem;color:var(--blue)">${lead.name}</div>
-        <div style="font-size:0.78rem;color:var(--text3)">${lead.team || ''} · ${responses} assessor${responses !== 1 ? 's' : ''}</div>
-      </div>
-      ${score !== null ? `
-        <div style="flex:2;min-width:120px">
-          <div style="display:flex;justify-content:space-between;margin-bottom:4px">
-            <span style="font-size:0.78rem;color:var(--text3)">${scoreLabel(score)}</span>
-            <span style="font-size:0.82rem;font-weight:700;color:${scoreColor(score)}">${score}%</span>
-          </div>
-          <div class="progress-bar"><div class="progress-fill ${fillClass(score)}" style="width:${score}%"></div></div>
-        </div>` : `<span style="font-size:0.78rem;color:var(--text3)">No assessments yet</span>`}
+      <div style="flex:1;min-width:0"><div style="font-weight:700;font-size:0.9rem;color:var(--blue)">${lead.name}</div><div style="font-size:0.78rem;color:var(--text3)">${lead.team||''} · ${cnt} assessor${cnt!==1?'s':''}</div></div>
+      ${score!==null?`<div style="flex:2;min-width:120px"><div style="display:flex;justify-content:space-between;margin-bottom:4px"><span style="font-size:0.78rem;color:var(--text3)">${scoreLabel(score)}</span><span style="font-size:0.82rem;font-weight:700;color:${scoreColor(score)}">${score}%</span></div><div class="progress-bar"><div class="progress-fill ${fillClass(score)}" style="width:${score}%"></div></div></div>`:
+      `<span style="font-size:0.78rem;color:var(--text3)">No assessments yet</span>`}
     </div>`;
   }).join('') : '<div class="empty-state"><div class="icon">👥</div><p>No QA Leads added yet.</p></div>';
   document.getElementById('dash-leads-overview').innerHTML = leadsHtml;
-
-  if (teamScore !== null) {
+  if (teamScore!==null) {
     document.getElementById('dash-team-score').innerHTML = `
       <div style="display:flex;align-items:center;gap:2rem;flex-wrap:wrap">
-        <div style="text-align:center">
-          <div style="font-size:3.8rem;font-weight:800;color:${scoreColor(teamScore)}">${teamScore}%</div>
-          <div style="font-size:0.9rem;color:var(--text3);font-weight:600">${scoreLabel(teamScore)}</div>
-        </div>
+        <div style="text-align:center"><div style="font-size:3.8rem;font-weight:800;color:${scoreColor(teamScore)}">${teamScore}%</div><div style="font-size:0.9rem;color:var(--text3);font-weight:600">${scoreLabel(teamScore)}</div></div>
         <div style="flex:1;min-width:200px">
           <div class="progress-bar" style="height:16px"><div class="progress-fill ${fillClass(teamScore)}" style="width:${teamScore}%"></div></div>
-          <div style="display:flex;justify-content:space-between;margin-top:6px;font-size:0.75rem;color:var(--text3)">
-            <span>0%</span><span>25%</span><span>50%</span><span>75%</span><span>100%</span>
-          </div>
+          <div style="display:flex;justify-content:space-between;margin-top:6px;font-size:0.75rem;color:var(--text3)"><span>0%</span><span>25%</span><span>50%</span><span>75%</span><span>100%</span></div>
           <div style="margin-top:1rem;display:flex;gap:1.5rem;font-size:0.82rem;flex-wrap:wrap">
-            <span>📊 Based on <strong>${leadsWithData}</strong> lead(s) with data</span>
-            <span>✅ <strong>${completedResponses}</strong> total responses</span>
-            <span>⏳ <strong>${pendingSurveys}</strong> pending</span>
+            <span>📊 <strong>${withData}</strong> lead(s) with data</span>
+            <span>✅ <strong>${completed}</strong> responses</span>
+            <span>⏳ <strong>${pending}</strong> pending</span>
           </div>
         </div>
       </div>`;
-  } else {
-    document.getElementById('dash-team-score').innerHTML = '<div class="empty-state"><div class="icon">📊</div><p>No assessment data yet. Send survey links and wait for responses.</p></div>';
-  }
+  } else { document.getElementById('dash-team-score').innerHTML='<div class="empty-state"><div class="icon">📊</div><p>No assessment data yet.</p></div>'; }
 }
 
-// ═══════════════════════════════════════════════════════════
+// ═══════════════════════════════════════════════════════════════════════
 //  REPORTS
-// ═══════════════════════════════════════════════════════════
-let currentReportTab = 'summary';
+// ═══════════════════════════════════════════════════════════════════════
+let currentReportTab='summary';
 function switchReportTab(tab) {
-  currentReportTab = tab;
-  ['summary', 'comparison', 'detail'].forEach(t => {
-    document.getElementById('report-' + t).style.display = t === tab ? 'block' : 'none';
-    document.getElementById('rtab-' + t).classList.toggle('active', t === tab);
-  });
+  currentReportTab=tab;
+  ['summary','comparison','detail'].forEach(t=>{ document.getElementById('report-'+t).style.display=t===tab?'block':'none'; document.getElementById('rtab-'+t).classList.toggle('active',t===tab); });
   renderReports();
 }
 function renderReports() {
-  if (currentReportTab === 'summary') renderReportSummary();
-  else if (currentReportTab === 'comparison') renderReportComparison();
+  if(currentReportTab==='summary') renderReportSummary();
+  else if(currentReportTab==='comparison') renderReportComparison();
   else renderReportDetail();
 }
 function renderReportSummary() {
-  const el = document.getElementById('report-summary');
-  if (!store.leads.length) { el.innerHTML = '<div class="empty-state"><div class="icon">📈</div><p>No data available yet.</p></div>'; return; }
-  const rows = store.leads.map(lead => {
-    const score = calcLeadScore(lead.id);
-    const responses = store.responses.filter(r => r.leadId === lead.id);
-    return `<tr>
-      <td><div style="display:flex;align-items:center;gap:8px">
-        <div class="lead-avatar" style="width:30px;height:30px;min-width:30px;font-size:0.7rem">${initials(lead.name)}</div>
-        <div><div style="font-weight:700;color:var(--blue)">${lead.name}</div><div style="font-size:0.75rem;color:var(--text3)">${lead.team || ''}</div></div>
-      </div></td>
-      <td>${responses.length}</td>
-      <td>${score !== null ? `<span style="color:${scoreColor(score)};font-weight:700">${score}%</span>` : '<span style="color:var(--text3)">N/A</span>'}</td>
-      <td>${score !== null ? `<span class="badge" style="background:${scoreColor(score)}22;color:${scoreColor(score)}">${scoreLabel(score)}</span>` : '—'}</td>
-      <td>${score !== null ? `<div class="progress-bar" style="width:100px;display:inline-block"><div class="progress-fill ${fillClass(score)}" style="width:${score}%"></div></div>` : '—'}</td>
+  const el=document.getElementById('report-summary');
+  if(!store.leads.length){el.innerHTML='<div class="empty-state"><div class="icon">📈</div><p>No data yet.</p></div>';return;}
+  const rows=store.leads.map(lead=>{
+    const score=calcLeadScore(lead.id);
+    const cnt=store.responses.filter(r=>r.leadId===lead.id).length;
+    return `<tr><td><div style="display:flex;align-items:center;gap:8px"><div class="lead-avatar" style="width:30px;height:30px;min-width:30px;font-size:0.7rem">${initials(lead.name)}</div><div><div style="font-weight:700;color:var(--blue)">${lead.name}</div><div style="font-size:0.75rem;color:var(--text3)">${lead.team||''}</div></div></div></td>
+      <td>${cnt}</td>
+      <td>${score!==null?`<span style="color:${scoreColor(score)};font-weight:700">${score}%</span>`:'<span style="color:var(--text3)">N/A</span>'}</td>
+      <td>${score!==null?`<span class="badge" style="background:${scoreColor(score)}22;color:${scoreColor(score)}">${scoreLabel(score)}</span>`:'—'}</td>
+      <td>${score!==null?`<div class="progress-bar" style="width:100px;display:inline-block"><div class="progress-fill ${fillClass(score)}" style="width:${score}%"></div></div>`:'—'}</td>
     </tr>`;
   }).join('');
-  el.innerHTML = `<div class="card"><div class="table-wrap"><table>
-    <thead><tr><th>QA Lead</th><th>Assessors</th><th>Score</th><th>Rating</th><th>Progress</th></tr></thead>
-    <tbody>${rows}</tbody>
-  </table></div></div>`;
+  el.innerHTML=`<div class="card"><div class="table-wrap"><table><thead><tr><th>QA Lead</th><th>Assessors</th><th>Score</th><th>Rating</th><th>Progress</th></tr></thead><tbody>${rows}</tbody></table></div></div>`;
 }
 function renderReportComparison() {
-  const el = document.getElementById('report-comparison');
-  const leadsWithData = store.leads.filter(l => store.responses.some(r => r.leadId === l.id));
-  if (!leadsWithData.length) { el.innerHTML = '<div class="empty-state"><div class="icon">📊</div><p>No assessment data yet for comparison.</p></div>'; return; }
-  const ratingQs = store.questions.filter(q => q.type === 'rating');
-  let rows = ratingQs.map(q => {
-    const cells = leadsWithData.map(lead => {
-      const responses = store.responses.filter(r => r.leadId === lead.id);
-      if (!responses.length) return '<td style="text-align:center;color:var(--text3)">—</td>';
-      let tot = 0, cnt = 0;
-      responses.forEach(r => { const a = r.answers[q.id]; if (a !== undefined) { tot += Number(a); cnt++; } });
-      const avg = cnt ? (tot / cnt).toFixed(1) : null;
-      const pct = cnt ? Math.round((tot / cnt / 5) * 100) : null;
-      return `<td style="text-align:center"><span style="color:${scoreColor(pct)};font-weight:700">${avg}</span><br><span style="font-size:0.72rem;color:var(--text3)">${pct}%</span></td>`;
+  const el=document.getElementById('report-comparison');
+  const leadsWD=store.leads.filter(l=>store.responses.some(r=>r.leadId===l.id));
+  if(!leadsWD.length){el.innerHTML='<div class="empty-state"><div class="icon">📊</div><p>No assessment data yet.</p></div>';return;}
+  const rQs=store.questions.filter(q=>q.type==='rating');
+  // Bar chart
+  const chart=`<div class="card" style="margin-bottom:1rem"><div class="card-title">Overall Score Comparison</div>${leadsWD.map(lead=>{
+    const score=calcLeadScore(lead.id); if(score===null)return'';
+    return`<div style="display:flex;align-items:center;gap:12px;margin-bottom:10px"><div style="width:130px;text-align:right;font-size:0.85rem;font-weight:600;color:var(--text2);overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${lead.name.split(' ')[0]}</div><div style="flex:1;height:26px;background:var(--border);border-radius:6px;overflow:hidden"><div style="width:${score}%;height:100%;background:${scoreColor(score)};border-radius:6px;display:flex;align-items:center;padding-left:8px"><span style="font-size:0.75rem;font-weight:700;color:#fff">${score}%</span></div></div><div style="width:80px;font-size:0.78rem;color:var(--text3)">${scoreLabel(score)}</div></div>`;
+  }).join('')}</div>`;
+  const headers=leadsWD.map(l=>`<th style="text-align:center;min-width:90px">${l.name.split(' ')[0]}</th>`).join('');
+  const rows=rQs.map(q=>{
+    const cells=leadsWD.map(lead=>{
+      const resps=store.responses.filter(r=>r.leadId===lead.id);
+      if(!resps.length) return'<td style="text-align:center;color:var(--text3)">—</td>';
+      let t=0,c=0; resps.forEach(r=>{const a=r.answers[q.id];if(a!=null){t+=Number(a);c++;}});
+      const avg=c?(t/c).toFixed(1):null; const pct=c?Math.round(t/c/5*100):null;
+      return`<td style="text-align:center"><span style="color:${scoreColor(pct)};font-weight:700">${avg}</span><br><span style="font-size:0.72rem;color:var(--text3)">${pct}%</span></td>`;
     }).join('');
-    return `<tr><td style="font-size:0.82rem;max-width:260px">${q.text.length > 70 ? q.text.substring(0,70)+'...' : q.text}</td>${cells}</tr>`;
+    return`<tr><td style="font-size:0.82rem;max-width:260px"><strong style="color:var(--blue)">${q.category||''}</strong><br><span style="color:var(--text3);font-size:0.75rem">${q.text.substring(0,60)}…</span></td>${cells}</tr>`;
   }).join('');
-  const headers = leadsWithData.map(l => `<th style="text-align:center;min-width:90px">${l.name.split(' ')[0]}</th>`).join('');
-  el.innerHTML = `<div class="card"><div class="table-wrap"><table>
-    <thead><tr><th>Question</th>${headers}</tr></thead>
-    <tbody>${rows}</tbody>
-  </table></div></div>`;
+  el.innerHTML=chart+`<div class="card"><div class="table-wrap"><table><thead><tr><th>Dimension</th>${headers}</tr></thead><tbody>${rows}</tbody></table></div></div>`;
 }
 function renderReportDetail() {
-  const el = document.getElementById('report-detail');
-  if (!store.leads.length) { el.innerHTML = '<div class="empty-state"><p>No leads.</p></div>'; return; }
-  const html = store.leads.map(lead => {
-    const responses = store.responses.filter(r => r.leadId === lead.id);
-    const score = calcLeadScore(lead.id);
-    const breakdown = calcLeadScoreBreakdown(lead.id);
-    const ratingQs = store.questions.filter(q => q.type === 'rating');
-    const openQs = store.questions.filter(q => q.type === 'open');
-    const breakdownHtml = breakdown ? ratingQs.map(q => {
-      const s = breakdown[q.id];
-      if (s === null) return '';
-      return `<div style="margin-bottom:10px">
-        <div style="display:flex;justify-content:space-between;font-size:0.82rem;margin-bottom:4px">
-          <span style="color:var(--text2)">${q.text.length > 55 ? q.text.substring(0,55)+'...' : q.text}</span>
-          <span style="font-weight:700;color:${scoreColor(s)}">${s}%</span>
-        </div>
-        <div class="progress-bar"><div class="progress-fill ${fillClass(s)}" style="width:${s}%"></div></div>
-      </div>`;
-    }).join('') : '<p style="color:var(--text3);font-size:0.85rem">No rating data.</p>';
-    const openResponsesHtml = openQs.map(q => {
-      const answers = responses.map(r => r.answers[q.id]).filter(Boolean);
-      if (!answers.length) return '';
-      return `<div style="margin-bottom:1rem">
-        <div style="font-size:0.82rem;font-weight:700;color:var(--blue);margin-bottom:6px">${q.text}</div>
-        ${answers.map(a => `<div style="background:var(--blue-light);border:1px solid var(--border);border-radius:6px;padding:8px 12px;font-size:0.85rem;margin-bottom:6px;color:var(--text)">${a}</div>`).join('')}
-      </div>`;
+  const el=document.getElementById('report-detail');
+  if(!store.leads.length){el.innerHTML='<div class="empty-state"><p>No leads.</p></div>';return;}
+  const rQs=store.questions.filter(q=>q.type==='rating');
+  const oQs=store.questions.filter(q=>q.type==='open');
+  el.innerHTML=store.leads.map(lead=>{
+    const resps=store.responses.filter(r=>r.leadId===lead.id);
+    const score=calcLeadScore(lead.id);
+    const bd=calcLeadScoreBreakdown(lead.id);
+    const bdHtml=bd?rQs.map(q=>{ const s=bd[q.id]; if(s===null)return'';
+      return`<div style="margin-bottom:10px"><div style="display:flex;justify-content:space-between;font-size:0.82rem;margin-bottom:4px"><span style="color:var(--text2)">${q.category||q.text.substring(0,50)}</span><span style="font-weight:700;color:${scoreColor(s)}">${s}%</span></div><div class="progress-bar"><div class="progress-fill ${fillClass(s)}" style="width:${s}%"></div></div></div>`;
+    }).join(''):'<p style="color:var(--text3);font-size:0.85rem">No rating data.</p>';
+    const oHtml=oQs.map(q=>{ const ans=resps.map(r=>r.answers[q.id]).filter(Boolean); if(!ans.length)return'';
+      return`<div style="margin-bottom:1rem"><div style="font-size:0.82rem;font-weight:700;color:var(--blue);margin-bottom:6px">${q.text}</div>${ans.map(a=>`<div style="background:var(--blue-light);border:1px solid var(--border);border-radius:6px;padding:8px 12px;font-size:0.85rem;margin-bottom:6px">${a}</div>`).join('')}</div>`;
     }).join('');
-    return `<div class="card" style="margin-bottom:1.5rem">
-      <div style="display:flex;align-items:center;gap:1rem;margin-bottom:1.5rem;padding-bottom:1rem;border-bottom:2px solid var(--yellow)">
-        <div class="lead-avatar">${initials(lead.name)}</div>
-        <div style="flex:1">
-          <div style="font-size:1.1rem;font-weight:700;color:var(--blue)">${lead.name}</div>
-          <div style="font-size:0.82rem;color:var(--text3)">${lead.team || ''} · ${responses.length} assessor${responses.length !== 1 ? 's' : ''}</div>
-        </div>
-        ${score !== null ? `<div class="score-circle" style="border-color:${scoreColor(score)};color:${scoreColor(score)};width:80px;height:80px">
-          <span style="font-size:1.3rem;font-weight:800">${score}%</span>
-          <span style="font-size:0.65rem">${scoreLabel(score)}</span>
-        </div>` : ''}
-      </div>
-      <div class="grid-2">
-        <div>
-          <div class="card-title">Score by Category</div>
-          ${breakdownHtml}
-        </div>
-        <div>
-          <div class="card-title">Open-ended Responses</div>
-          ${openResponsesHtml || '<p style="color:var(--text3);font-size:0.85rem">No open responses yet.</p>'}
-        </div>
-      </div>
-      ${responses.length ? `<div style="margin-top:1rem;padding-top:1rem;border-top:1px solid var(--border)">
-        <div class="card-title">Assessor List</div>
-        <div style="display:flex;gap:6px;flex-wrap:wrap">
-          ${responses.map(r => `<span class="badge badge-blue">${r.assessorName} <span style="opacity:0.7">(${r.assessorPosition})</span></span>`).join('')}
-        </div>
-      </div>` : ''}
-    </div>`;
+    // Per-assessor table
+    const perAssessor=resps.length?`<div style="margin-top:1.5rem;padding-top:1rem;border-top:1px solid var(--border)"><div class="card-title">Per-Assessor Scores</div><div class="table-wrap"><table><thead><tr><th>Assessor</th><th>Position</th><th>Date</th>${rQs.map(q=>`<th style="text-align:center;min-width:60px;font-size:0.68rem">${(q.category||'').substring(0,15)}…</th>`).join('')}<th style="text-align:center">%</th></tr></thead><tbody>${resps.map(r=>{
+      let t=0,c=0;
+      const cells=rQs.map(q=>{ const v=r.answers[q.id]; if(v!=null){t+=Number(v);c++;} return`<td style="text-align:center;font-weight:600;color:${v?scoreColor(Math.round(Number(v)/5*100)):'var(--text3)'}">${v||'—'}</td>`;}).join('');
+      const pct=c?Math.round(t/(c*5)*100):null;
+      return`<tr><td><strong>${r.assessorName}</strong></td><td><span class="badge badge-gray">${r.assessorPosition}</span></td><td style="font-size:0.78rem;color:var(--text3)">${new Date(r.submittedAt).toLocaleDateString()}</td>${cells}<td style="text-align:center;font-weight:800;color:${pct?scoreColor(pct):'var(--text3)'}">${pct!==null?pct+'%':'—'}</td></tr>`;
+    }).join('')}</tbody></table></div></div>`:'' ;
+    return`<div class="card" style="margin-bottom:1.5rem"><div style="display:flex;align-items:center;gap:1rem;margin-bottom:1.5rem;padding-bottom:1rem;border-bottom:2px solid var(--yellow)"><div class="lead-avatar">${initials(lead.name)}</div><div style="flex:1"><div style="font-size:1.1rem;font-weight:700;color:var(--blue)">${lead.name}</div><div style="font-size:0.82rem;color:var(--text3)">${lead.team||''} · ${resps.length} assessor${resps.length!==1?'s':''}</div></div>${score!==null?`<div class="score-circle" style="border-color:${scoreColor(score)};color:${scoreColor(score)};width:80px;height:80px"><span style="font-size:1.3rem;font-weight:800">${score}%</span><span style="font-size:0.65rem">${scoreLabel(score)}</span></div>`:''}</div><div class="grid-2"><div><div class="card-title">Score by Category</div>${bdHtml}</div><div><div class="card-title">Open-ended Responses</div>${oHtml||'<p style="color:var(--text3);font-size:0.85rem">No open responses yet.</p>'}</div></div>${perAssessor}</div>`;
   }).join('');
-  el.innerHTML = html;
 }
 
-// ═══════════════════════════════════════════════════════════
-//  SURVEY FILL PAGE
-// ═══════════════════════════════════════════════════════════
+// ═══════════════════════════════════════════════════════════════════════
+//  SURVEY FILL PAGE  (runs when hash = #survey/<encoded>)
+// ═══════════════════════════════════════════════════════════════════════
 function checkSurveyRoute() {
-  // Support both #survey/<encoded> (new shareable) and ?survey=token (legacy)
-  const hash = window.location.hash; // e.g. #survey/<base64>
-  const params = new URLSearchParams(window.location.search);
-  const legacyToken = params.get('survey');
+  const hash = window.location.hash;
+  if (!hash.startsWith('#survey/')) return;
 
-  let payload = null;
-
-  if (hash.startsWith('#survey/')) {
-    // NEW: decode payload from hash — works on any device, no shared localStorage
-    try {
-      const encoded = hash.slice('#survey/'.length);
-      payload = JSON.parse(decodeURIComponent(escape(atob(encoded))));
-    } catch(e) {
-      payload = null;
-    }
-  } else if (legacyToken) {
-    // LEGACY: try to find in local store (only works on same browser)
-    const sv = store.surveys.find(s => s.token === legacyToken);
-    if (sv) {
-      const lead = store.leads.find(l => l.id === sv.leadId);
-      payload = { token: sv.token, surveyId: sv.id, leadId: sv.leadId, leadName: lead ? lead.name : '', leadTeam: lead ? lead.team : '', assessorName: sv.assessorName, assessorPosition: sv.assessorPosition, questions: store.questions };
-    }
+  let payload;
+  try {
+    const encoded = hash.slice('#survey/'.length);
+    payload = JSON.parse(decodeURIComponent(escape(atob(encoded))));
+  } catch(e) {
+    showSurveyError('❌', 'Invalid Link', 'This link is corrupted. Please ask the admin to generate a new one.');
+    return;
   }
 
-  if (!hash.startsWith('#survey/') && !legacyToken) return;
-
-  // Hide admin UI, show survey page
   document.getElementById('auth-screen').style.display = 'none';
   document.getElementById('app').style.display = 'none';
   document.getElementById('survey-page').style.display = 'flex';
 
-  if (!payload) {
-    document.getElementById('survey-content').innerHTML = `<div class="survey-complete"><div class="icon">❌</div><h2>Invalid Link</h2><p>This survey link is not valid, has expired, or was corrupted. Please ask the admin to generate a new link.</p></div>`;
-    return;
-  }
-
-  // Check if already submitted (stored under token key in localStorage)
-  const doneKey = 'qa360_done_' + payload.token;
-  if (localStorage.getItem(doneKey) === '1') {
-    document.getElementById('survey-content').innerHTML = `<div class="survey-complete"><div class="icon">✅</div><h2>Already Submitted</h2><p>You have already completed this assessment. Thank you!</p></div>`;
-    return;
-  }
-
-  // Also check admin's store if on same device
-  const localSv = store.surveys.find(s => s.token === payload.token);
-  if (localSv && localSv.status === 'completed') {
-    document.getElementById('survey-content').innerHTML = `<div class="survey-complete"><div class="icon">✅</div><h2>Already Submitted</h2><p>You have already completed this assessment. Thank you!</p></div>`;
+  // Already submitted? (check local flag)
+  if (localStorage.getItem('qa360_done_' + payload.token) === '1') {
+    showSurveyError('✅', 'Already Submitted', 'You have already completed this assessment. Thank you!');
     return;
   }
 
   document.getElementById('survey-header-title').textContent = `QA Lead Evaluation: ${payload.leadName}`;
   document.getElementById('survey-header-sub').textContent = `Assessor: ${payload.assessorName} · ${payload.assessorPosition} · CP Axtra`;
 
-  const questions = payload.questions || store.questions;
+  const questions = payload.questions || [];
   const questionsHtml = questions.map((q, i) => {
-    const catLabel = q.category ? `<div style="font-size:0.72rem;font-weight:700;color:var(--blue-mid);text-transform:uppercase;letter-spacing:0.07em;background:var(--blue-light);padding:3px 10px;border-radius:20px;display:inline-block;margin-bottom:10px">${q.category}</div>` : '';
+    const catLabel = q.category
+      ? `<div style="font-size:0.72rem;font-weight:700;color:var(--blue-mid);text-transform:uppercase;letter-spacing:0.07em;background:var(--blue-light);padding:3px 10px;border-radius:20px;display:inline-block;margin-bottom:10px">${q.category}</div>`
+      : '';
     if (q.type === 'rating' || q.type === 'custom') {
-      const opts = q.choices.map(c => `
-        <label class="radio-option" onclick="selectOption(this)">
-          <input type="radio" name="q_${q.id}" value="${c.value}">
-          ${c.label}
-        </label>`).join('');
-      return `<div class="survey-q-card">
-        <div class="survey-q-num">Question ${i + 1} · ${q.type === 'rating' ? 'Rating' : 'Choice'}</div>
-        ${catLabel}
-        <div class="survey-q-text">${q.text}</div>
-        <div class="radio-group" id="qg_${q.id}">${opts}</div>
-      </div>`;
+      const opts = q.choices.map(c => `<label class="radio-option" onclick="selectOption(this)"><input type="radio" name="q_${q.id}" value="${c.value}">${c.label}</label>`).join('');
+      return `<div class="survey-q-card"><div class="survey-q-num">Question ${i+1} · ${q.type==='rating'?'Rating':'Choice'}</div>${catLabel}<div class="survey-q-text">${q.text}</div><div class="radio-group">${opts}</div></div>`;
     } else {
-      return `<div class="survey-q-card">
-        <div class="survey-q-num">Question ${i + 1} · Open-ended (Optional)</div>
-        ${catLabel}
-        <div class="survey-q-text">${q.text}</div>
-        <textarea class="open-textarea" id="open_${q.id}" placeholder="Type your response here..."></textarea>
-      </div>`;
+      return `<div class="survey-q-card"><div class="survey-q-num">Question ${i+1} · Open-ended (Optional)</div>${catLabel}<div class="survey-q-text">${q.text}</div><textarea class="open-textarea" id="open_${q.id}" placeholder="Type your response here..."></textarea></div>`;
     }
   }).join('');
 
@@ -1278,30 +1147,36 @@ function checkSurveyRoute() {
       <div class="lead-avatar">${initials(payload.leadName)}</div>
       <div>
         <div style="font-weight:700;color:var(--blue)">${payload.leadName}</div>
-        <div style="font-size:0.82rem;color:var(--text3)">${payload.leadTeam || ''}</div>
+        <div style="font-size:0.82rem;color:var(--text3)">${payload.leadTeam||''}</div>
         <div style="font-size:0.78rem;color:var(--text3);margin-top:4px">Your evaluation will remain confidential.</div>
       </div>
     </div>
     <div id="survey-error"></div>
     ${questionsHtml}
     <div class="survey-submit-area">
-      <button class="btn btn-yellow" style="padding:14px 40px;font-size:1rem" onclick="submitSurvey(${JSON.stringify(payload).replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;')})">Submit Assessment →</button>
+      <button class="btn btn-yellow" id="btn-submit-survey" style="padding:14px 40px;font-size:1rem">Submit Assessment →</button>
       <p style="margin-top:12px;font-size:0.8rem;color:var(--text3)">Please answer all rating questions before submitting.</p>
-    </div>
-  `;
+    </div>`;
 
-  // Use data-payload attribute instead of inline JSON in onclick to avoid escaping issues
-  document.querySelector('.survey-submit-area .btn').removeAttribute('onclick');
-  document.querySelector('.survey-submit-area .btn').addEventListener('click', () => submitSurveyPayload(payload));
+  document.getElementById('btn-submit-survey').addEventListener('click', () => submitSurveyPayload(payload));
 }
+
+function showSurveyError(icon, title, msg) {
+  document.getElementById('auth-screen').style.display = 'none';
+  document.getElementById('app').style.display = 'none';
+  document.getElementById('survey-page').style.display = 'flex';
+  document.getElementById('survey-content').innerHTML = `<div class="survey-complete"><div class="icon">${icon}</div><h2>${title}</h2><p>${msg}</p></div>`;
+}
+
 function selectOption(label) {
   const group = label.closest('.radio-group');
   group.querySelectorAll('.radio-option').forEach(o => o.classList.remove('selected'));
   label.classList.add('selected');
   label.querySelector('input[type="radio"]').checked = true;
 }
-function submitSurveyPayload(payload) {
-  const questions = payload.questions || store.questions;
+
+async function submitSurveyPayload(payload) {
+  const questions = payload.questions || [];
   const answers = {};
   let allRating = true;
   questions.forEach(q => {
@@ -1319,8 +1194,13 @@ function submitSurveyPayload(payload) {
     return;
   }
 
+  const btn = document.getElementById('btn-submit-survey');
+  btn.disabled = true;
+  btn.innerHTML = '<span class="spinner"></span> Submitting…';
+
   const resp = {
-    id: store.nextId.response++,
+    _uid: payload.token + '_' + Date.now(), // unique ID for dedup
+    _token: payload.token,
     surveyId: payload.surveyId,
     leadId: payload.leadId,
     assessorName: payload.assessorName,
@@ -1329,41 +1209,86 @@ function submitSurveyPayload(payload) {
     submittedAt: new Date().toISOString()
   };
 
-  // Always save response to THIS device's localStorage (works if same device as admin)
-  store.responses.push(resp);
-  // Mark survey completed in admin store if token exists here
-  const localSv = store.surveys.find(s => s.token === payload.token);
-  if (localSv) { localSv.status = 'completed'; }
-  saveStore();
+  let cloudOk = false;
 
-  // Also mark done locally under the token so re-opens show "already submitted"
-  try { localStorage.setItem('qa360_done_' + payload.token, '1'); } catch(e) {}
+  // ── PRIMARY: push directly to JSONBin from assessor's browser ──
+  if (payload.cloudBinId && payload.cloudApiKey) {
+    try {
+      // Read current bin
+      const getRes = await fetch(`${JSONBIN_BASE}/b/${payload.cloudBinId}/latest`, {
+        headers: { 'X-Master-Key': payload.cloudApiKey }
+      });
+      const getData = await getRes.json();
+      const current = getData.record || { responses: [] };
+      if (!Array.isArray(current.responses)) current.responses = [];
+      // Dedup
+      if (!current.responses.some(r => r._uid === resp._uid)) {
+        current.responses.push(resp);
+      }
+      const putRes = await fetch(`${JSONBIN_BASE}/b/${payload.cloudBinId}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json', 'X-Master-Key': payload.cloudApiKey },
+        body: JSON.stringify(current)
+      });
+      if (putRes.ok) cloudOk = true;
+    } catch(e) { console.warn('Cloud push failed:', e); }
+  }
 
-  // Store response keyed by token so admin can import from other devices
+  // ── FALLBACK: also save to assessor's localStorage ──
+  // If admin opens this file on same machine, sync button picks it up
   try {
-    const pendingKey = 'qa360_pending_resp';
-    const existing = JSON.parse(localStorage.getItem(pendingKey) || '[]');
-    existing.push({ token: payload.token, resp, ts: new Date().toISOString() });
-    localStorage.setItem(pendingKey, JSON.stringify(existing));
+    const key = 'qa360_pending_' + payload.token;
+    localStorage.setItem(key, JSON.stringify(resp));
   } catch(e) {}
 
+  // Mark as done on this device
+  try { localStorage.setItem('qa360_done_' + payload.token, '1'); } catch(e) {}
+
+  // Show result
   document.getElementById('survey-content').innerHTML = `
     <div class="survey-complete">
       <div class="icon">🎉</div>
       <h2>Assessment Submitted!</h2>
       <p>Thank you, <strong>${payload.assessorName}</strong>. Your evaluation has been recorded.</p>
-      <p style="margin-top:8px;font-size:0.85rem">Your response will be included in the overall CP Axtra QA assessment report.</p>
+      ${cloudOk
+        ? '<p style="margin-top:12px;font-size:0.85rem;color:#1A7A40">☁️ Response sent to admin successfully.</p>'
+        : '<p style="margin-top:12px;font-size:0.85rem;color:var(--warn)">⚠️ Could not reach cloud — your response is saved locally. Ask the admin to sync.</p>'}
     </div>`;
 }
-// Legacy submitSurvey kept for backward compat
-function submitSurvey(token) {
-  const sv = store.surveys.find(s => s.token === token);
-  if (sv) submitSurveyPayload({ token: sv.token, surveyId: sv.id, leadId: sv.leadId, leadName: '', assessorName: sv.assessorName, assessorPosition: sv.assessorPosition, questions: store.questions });
+
+// ── Also handle localStorage-based fallback sync on admin side ──
+async function syncNowFull() {
+  // 1. Try cloud first
+  await syncNow();
+  // 2. Also check localStorage pending keys (same-device fallback)
+  let localCount = 0;
+  for (let i = 0; i < localStorage.length; i++) {
+    const key = localStorage.key(i);
+    if (key && key.startsWith('qa360_pending_sv_')) {
+      try {
+        const r = JSON.parse(localStorage.getItem(key));
+        const exists = store.responses.some(lr => lr._uid === r._uid);
+        if (!exists) {
+          r.id = store.nextId.response++;
+          store.responses.push(r);
+          const sv = store.surveys.find(s => s.token === r._token);
+          if (sv) sv.status = 'completed';
+          localCount++;
+        }
+      } catch(e) {}
+    }
+  }
+  if (localCount > 0) { saveStore(); renderAll(); }
 }
 
-// ═══════════════════════════════════════════════════════════
+// Override syncNow button to use full sync
+function syncNow(silent) {
+  return syncNowFull().catch(()=>{});
+}
+
+// ═══════════════════════════════════════════════════════════════════════
 //  BOOT
-// ═══════════════════════════════════════════════════════════
+// ═══════════════════════════════════════════════════════════════════════
 checkSurveyRoute();
 </script>
 </body>
