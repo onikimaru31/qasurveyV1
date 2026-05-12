@@ -290,8 +290,12 @@
   <div class="page active" id="page-dashboard">
     <div class="page-header">
       <div><div class="page-title">Dashboard</div><div class="page-subtitle">Overview of QA Lead assessment results</div></div>
-      <button class="btn btn-success btn-sm" onclick="syncNow()" id="btn-sync-dash">🔄 Sync Responses</button>
+      <div style="display:flex;gap:8px">
+        <button class="btn btn-outline btn-sm" onclick="debugSync()">🔍 Debug</button>
+        <button class="btn btn-success btn-sm" onclick="syncNow(false)" id="btn-sync-dash">🔄 Sync Responses</button>
+      </div>
     </div>
+    <div id="debug-panel" style="display:none;margin-bottom:1rem"></div>
     <div id="sync-setup-banner"></div>
     <div class="grid-4" style="margin-bottom:1.5rem" id="dash-stats"></div>
     <div class="card" style="margin-bottom:1.5rem"><div class="card-title">QA Lead Performance Overview</div><div id="dash-leads-overview"></div></div>
@@ -621,41 +625,46 @@ async function pushResponseToCloud(resp) {
 
 // Pull all responses from cloud and merge into local store
 async function syncNow(silent) {
+  // Always check local fallback first (same-device submissions)
+  const localCount = syncLocalFallback();
+  if (localCount > 0) { saveStore(); renderAll(); }
+
   if (!cloudCfg) {
     if (!silent) showSyncMsg('⚠️ Cloud not configured. Click the sync indicator to set up.', 'yellow');
+    if (localCount > 0 && !silent) showSyncMsg(`✅ Merged ${localCount} local response${localCount>1?'s':''}.`, 'green');
     return;
   }
   setSyncStatus('syncing', 'Syncing…');
   try {
     const res = await fetch(`${JSONBIN_BASE}/b/${cloudCfg.binId}/latest`, {
-      headers: { 'X-Master-Key': cloudCfg.apiKey }
+      headers: { 'X-Master-Key': cloudCfg.apiKey, 'X-Bin-Meta': 'false' }
     });
-    if (!res.ok) throw new Error('Fetch failed');
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
     const data = await res.json();
-    const cloudResponses = (data.record && data.record.responses) || [];
+    // JSONBin v3 wraps in { record: {...} } — handle both shapes
+    const record = data.record !== undefined ? data.record : data;
+    const cloudResponses = Array.isArray(record.responses) ? record.responses : [];
     let newCount = 0;
     cloudResponses.forEach(r => {
+      if (!r || !r._uid) return;
       const exists = store.responses.some(lr => lr._uid === r._uid);
       if (!exists) {
         r.id = store.nextId.response++;
+        r.leadId = Number(r.leadId); // ensure numeric match
         store.responses.push(r);
-        // Mark survey completed
         const sv = store.surveys.find(s => s.token === r._token);
         if (sv) sv.status = 'completed';
         newCount++;
       }
     });
-    if (newCount > 0) {
-      saveStore();
-      renderAll();
-      if (!silent) showSyncMsg(`✅ Synced! ${newCount} new response${newCount>1?'s':''} received.`, 'green');
-    } else {
-      if (!silent) showSyncMsg('✓ Up to date. No new responses.', 'green');
-    }
+    const total = newCount + localCount;
+    if (total > 0) { saveStore(); renderAll(); }
+    if (!silent) showSyncMsg(total > 0 ? `✅ ${total} new response${total>1?'s':''} received!` : '✓ Up to date. No new responses.', total > 0 ? 'green' : 'green');
     setSyncStatus('connected', `Last sync: ${new Date().toLocaleTimeString()}`);
   } catch(e) {
+    console.error('Sync error:', e);
     setSyncStatus('error', 'Sync failed');
-    if (!silent) showSyncMsg('❌ Sync failed. Check your connection or API key.', 'red');
+    if (!silent) showSyncMsg(`❌ Sync failed: ${e.message}`, 'red');
   }
 }
 
@@ -959,20 +968,29 @@ function renderSurveys() {
 //  SCORING
 // ═══════════════════════════════════════════════════════════════════════
 function calcLeadScore(leadId) {
-  const resps = store.responses.filter(r=>r.leadId===leadId);
+  const resps = store.responses.filter(r => Number(r.leadId) === Number(leadId));
   if (!resps.length) return null;
-  let tot=0,cnt=0;
-  resps.forEach(r=>{ store.questions.filter(q=>q.type==='rating').forEach(q=>{ const a=r.answers[q.id]; if(a!=null){tot+=Number(a);cnt++;} }); });
-  return cnt ? Math.round((tot/(cnt*5))*100) : null;
+  let tot = 0, cnt = 0;
+  resps.forEach(r => {
+    store.questions.filter(q => q.type === 'rating').forEach(q => {
+      // answers keys may be string or number — check both
+      const a = r.answers[q.id] !== undefined ? r.answers[q.id] : r.answers[String(q.id)];
+      if (a != null && a !== '') { tot += Number(a); cnt++; }
+    });
+  });
+  return cnt ? Math.round((tot / (cnt * 5)) * 100) : null;
 }
 function calcLeadScoreBreakdown(leadId) {
-  const resps = store.responses.filter(r=>r.leadId===leadId);
+  const resps = store.responses.filter(r => Number(r.leadId) === Number(leadId));
   if (!resps.length) return null;
-  const out={};
-  store.questions.filter(q=>q.type==='rating').forEach(q=>{
-    let t=0,c=0;
-    resps.forEach(r=>{ const a=r.answers[q.id]; if(a!=null){t+=Number(a);c++;} });
-    out[q.id] = c ? Math.round((t/c/5)*100) : null;
+  const out = {};
+  store.questions.filter(q => q.type === 'rating').forEach(q => {
+    let t = 0, c = 0;
+    resps.forEach(r => {
+      const a = r.answers[q.id] !== undefined ? r.answers[q.id] : r.answers[String(q.id)];
+      if (a != null && a !== '') { t += Number(a); c++; }
+    });
+    out[q.id] = c ? Math.round((t / c / 5) * 100) : null;
   });
   return out;
 }
@@ -1182,10 +1200,10 @@ async function submitSurveyPayload(payload) {
   questions.forEach(q => {
     if (q.type === 'rating' || q.type === 'custom') {
       const sel = document.querySelector(`input[name="q_${q.id}"]:checked`);
-      if (!sel) { allRating = false; } else { answers[q.id] = sel.value; }
+      if (!sel) { allRating = false; } else { answers[String(q.id)] = sel.value; }
     } else {
       const ta = document.getElementById(`open_${q.id}`);
-      if (ta && ta.value.trim()) answers[q.id] = ta.value.trim();
+      if (ta && ta.value.trim()) answers[String(q.id)] = ta.value.trim();
     }
   });
   if (!allRating) {
@@ -1199,52 +1217,53 @@ async function submitSurveyPayload(payload) {
   btn.innerHTML = '<span class="spinner"></span> Submitting…';
 
   const resp = {
-    _uid: payload.token + '_' + Date.now(), // unique ID for dedup
+    _uid: payload.token + '_' + Date.now(),
     _token: payload.token,
-    surveyId: payload.surveyId,
-    leadId: payload.leadId,
+    surveyId: Number(payload.surveyId),
+    leadId: Number(payload.leadId),
     assessorName: payload.assessorName,
     assessorPosition: payload.assessorPosition,
     answers,
     submittedAt: new Date().toISOString()
   };
 
+  console.log('[QA360] Submitting response:', resp);
+
   let cloudOk = false;
 
   // ── PRIMARY: push directly to JSONBin from assessor's browser ──
   if (payload.cloudBinId && payload.cloudApiKey) {
     try {
-      // Read current bin
-      const getRes = await fetch(`${JSONBIN_BASE}/b/${payload.cloudBinId}/latest`, {
-        headers: { 'X-Master-Key': payload.cloudApiKey }
+      const getRes = await fetch(`https://api.jsonbin.io/v3/b/${payload.cloudBinId}/latest`, {
+        headers: { 'X-Master-Key': payload.cloudApiKey, 'X-Bin-Meta': 'false' }
       });
       const getData = await getRes.json();
-      const current = getData.record || { responses: [] };
-      if (!Array.isArray(current.responses)) current.responses = [];
+      const record = getData.record !== undefined ? getData.record : getData;
+      const current = { responses: Array.isArray(record.responses) ? record.responses : [] };
       // Dedup
       if (!current.responses.some(r => r._uid === resp._uid)) {
         current.responses.push(resp);
       }
-      const putRes = await fetch(`${JSONBIN_BASE}/b/${payload.cloudBinId}`, {
+      const putRes = await fetch(`https://api.jsonbin.io/v3/b/${payload.cloudBinId}`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json', 'X-Master-Key': payload.cloudApiKey },
         body: JSON.stringify(current)
       });
-      if (putRes.ok) cloudOk = true;
-    } catch(e) { console.warn('Cloud push failed:', e); }
+      if (putRes.ok) { cloudOk = true; console.log('[QA360] Cloud push OK'); }
+      else { const t = await putRes.text(); console.warn('[QA360] Cloud push failed:', putRes.status, t); }
+    } catch(e) { console.warn('[QA360] Cloud push error:', e); }
+  } else {
+    console.warn('[QA360] No cloud config in payload — cloud push skipped');
   }
 
-  // ── FALLBACK: also save to assessor's localStorage ──
-  // If admin opens this file on same machine, sync button picks it up
+  // ── FALLBACK: save to assessor's localStorage ──
   try {
-    const key = 'qa360_pending_' + payload.token;
-    localStorage.setItem(key, JSON.stringify(resp));
+    localStorage.setItem('qa360_pending_' + payload.token, JSON.stringify(resp));
   } catch(e) {}
 
   // Mark as done on this device
   try { localStorage.setItem('qa360_done_' + payload.token, '1'); } catch(e) {}
 
-  // Show result
   document.getElementById('survey-content').innerHTML = `
     <div class="survey-complete">
       <div class="icon">🎉</div>
@@ -1252,38 +1271,84 @@ async function submitSurveyPayload(payload) {
       <p>Thank you, <strong>${payload.assessorName}</strong>. Your evaluation has been recorded.</p>
       ${cloudOk
         ? '<p style="margin-top:12px;font-size:0.85rem;color:#1A7A40">☁️ Response sent to admin successfully.</p>'
-        : '<p style="margin-top:12px;font-size:0.85rem;color:var(--warn)">⚠️ Could not reach cloud — your response is saved locally. Ask the admin to sync.</p>'}
+        : '<p style="margin-top:12px;font-size:0.85rem;color:var(--warn)">⚠️ Cloud not reached — response saved locally. Ask the admin to open the file on this device and click Sync.</p>'}
     </div>`;
 }
 
-// ── Also handle localStorage-based fallback sync on admin side ──
-async function syncNowFull() {
-  // 1. Try cloud first
-  await syncNow();
-  // 2. Also check localStorage pending keys (same-device fallback)
-  let localCount = 0;
-  for (let i = 0; i < localStorage.length; i++) {
-    const key = localStorage.key(i);
-    if (key && key.startsWith('qa360_pending_sv_')) {
-      try {
-        const r = JSON.parse(localStorage.getItem(key));
-        const exists = store.responses.some(lr => lr._uid === r._uid);
-        if (!exists) {
-          r.id = store.nextId.response++;
-          store.responses.push(r);
-          const sv = store.surveys.find(s => s.token === r._token);
-          if (sv) sv.status = 'completed';
-          localCount++;
-        }
-      } catch(e) {}
-    }
-  }
-  if (localCount > 0) { saveStore(); renderAll(); }
+// ── localStorage fallback: pull responses saved on same device ──
+function syncLocalFallback() {
+  let count = 0;
+  const keys = [];
+  for (let i = 0; i < localStorage.length; i++) { keys.push(localStorage.key(i)); }
+  keys.forEach(key => {
+    // Match both prefixes used across versions
+    if (!key || (!key.startsWith('qa360_pending_sv_') && !key.startsWith('qa360_pending_sv'))) return;
+    try {
+      const r = JSON.parse(localStorage.getItem(key));
+      if (!r || !r._uid) return;
+      const exists = store.responses.some(lr => lr._uid === r._uid);
+      if (!exists) {
+        r.id = store.nextId.response++;
+        r.leadId = Number(r.leadId);
+        store.responses.push(r);
+        const sv = store.surveys.find(s => s.token === r._token);
+        if (sv) sv.status = 'completed';
+        count++;
+        console.log('[QA360] Local fallback merged:', r._uid);
+      }
+    } catch(e) { console.warn('[QA360] Local fallback parse error:', key, e); }
+  });
+  return count;
 }
 
-// Override syncNow button to use full sync
-function syncNow(silent) {
-  return syncNowFull().catch(()=>{});
+// ═══════════════════════════════════════════════════════════════════════
+//  DEBUG
+// ═══════════════════════════════════════════════════════════════════════
+async function debugSync() {
+  const panel = document.getElementById('debug-panel');
+  panel.style.display = 'block';
+  panel.innerHTML = '<div class="alert alert-yellow">🔍 Fetching debug info…</div>';
+
+  let lines = [];
+  lines.push(`<strong>Local store:</strong> ${store.responses.length} responses, ${store.surveys.length} surveys, ${store.leads.length} leads`);
+  lines.push(`<strong>Cloud config:</strong> ${cloudCfg ? `BinID=${cloudCfg.binId}` : 'NOT SET'}`);
+
+  // Check local pending keys
+  let localKeys = [];
+  for (let i = 0; i < localStorage.length; i++) {
+    const k = localStorage.key(i);
+    if (k && k.startsWith('qa360_pending_')) localKeys.push(k);
+  }
+  lines.push(`<strong>Local pending keys:</strong> ${localKeys.length > 0 ? localKeys.join(', ') : 'none'}`);
+
+  // Try cloud fetch
+  if (cloudCfg) {
+    try {
+      const res = await fetch(`https://api.jsonbin.io/v3/b/${cloudCfg.binId}/latest`, {
+        headers: { 'X-Master-Key': cloudCfg.apiKey, 'X-Bin-Meta': 'false' }
+      });
+      const txt = await res.text();
+      lines.push(`<strong>Cloud HTTP status:</strong> ${res.status}`);
+      try {
+        const data = JSON.parse(txt);
+        const record = data.record !== undefined ? data.record : data;
+        const cloudResps = Array.isArray(record.responses) ? record.responses : [];
+        lines.push(`<strong>Cloud responses count:</strong> ${cloudResps.length}`);
+        if (cloudResps.length > 0) {
+          lines.push('<strong>Cloud entries:</strong>');
+          cloudResps.forEach((r,i) => lines.push(`&nbsp;&nbsp;[${i+1}] assessor=${r.assessorName}, leadId=${r.leadId}, submitted=${r.submittedAt}, uid=${r._uid}`));
+        }
+      } catch(e) { lines.push(`<strong>Cloud response (raw):</strong> ${txt.substring(0,300)}`); }
+    } catch(e) { lines.push(`<strong>Cloud fetch error:</strong> ${e.message}`); }
+  }
+
+  // Local responses detail
+  if (store.responses.length > 0) {
+    lines.push('<strong>Local responses:</strong>');
+    store.responses.forEach((r,i) => lines.push(`&nbsp;&nbsp;[${i+1}] assessor=${r.assessorName}, leadId=${r.leadId}, keys=${Object.keys(r.answers||{}).join(',')}`));
+  }
+
+  panel.innerHTML = `<div class="card" style="font-size:0.82rem;font-family:'DM Mono',monospace;line-height:2">${lines.join('<br>')}<br><br><button class="btn btn-outline btn-sm" onclick="document.getElementById('debug-panel').style.display='none'">Close</button></div>`;
 }
 
 // ═══════════════════════════════════════════════════════════════════════
