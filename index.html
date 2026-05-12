@@ -496,7 +496,6 @@
 <div class="modal-overlay" id="modal-add-question">
   <div class="modal">
     <div class="modal-title">Add Question</div>
-    <div class="form-group"><label>Category / Dimension</label><input type="text" id="q-category" placeholder="e.g. Leadership & Ownership"></div>
     <div class="form-group"><label>Question Text</label><textarea id="q-text" placeholder="Enter the question..."></textarea></div>
     <div class="form-group">
       <label>Question Type</label>
@@ -521,7 +520,6 @@
   <div class="modal">
     <div class="modal-title">Edit Question</div>
     <input type="hidden" id="eq-id">
-    <div class="form-group"><label>Category / Dimension</label><input type="text" id="eq-category" placeholder="e.g. Leadership & Ownership"></div>
     <div class="form-group"><label>Question Text</label><textarea id="eq-text"></textarea></div>
     <div class="form-group">
       <label>Question Type</label>
@@ -767,7 +765,6 @@ function toggleEditChoicesEditor() {
 }
 function saveQuestion() {
   const text = document.getElementById('q-text').value.trim();
-  const category = document.getElementById('q-category').value.trim();
   const type = document.getElementById('q-type').value;
   if (!text) return alert('Please enter question text.');
   let choices = [];
@@ -776,17 +773,15 @@ function saveQuestion() {
     const raw = document.getElementById('q-choices').value.trim();
     choices = raw.split('\n').map(l => { const [v, ...rest] = l.split('|'); return { value: isNaN(v) ? v : Number(v), label: rest.join('|') || v }; }).filter(c => c.label);
   }
-  store.questions.push({ id: store.nextId.q++, text, category: category || text.substring(0, 40), type, choices });
+  store.questions.push({ id: store.nextId.q++, text, category: text.substring(0, 40), type, choices });
   saveStore(); closeModal('modal-add-question');
   document.getElementById('q-text').value = '';
-  document.getElementById('q-category').value = '';
   renderQuestions();
 }
 function openEditQuestion(id) {
   const q = store.questions.find(q => q.id === id);
   if (!q) return;
   document.getElementById('eq-id').value = id;
-  document.getElementById('eq-category').value = q.category || '';
   document.getElementById('eq-text').value = q.text;
   document.getElementById('eq-type').value = q.type;
   if (q.type === 'custom') {
@@ -802,7 +797,6 @@ function updateQuestion() {
   const q = store.questions.find(q => q.id === id);
   if (!q) return;
   q.text = document.getElementById('eq-text').value.trim();
-  q.category = document.getElementById('eq-category').value.trim() || q.category;
   q.type = document.getElementById('eq-type').value;
   if (q.type === 'rating') q.choices = defaultChoices;
   else if (q.type === 'custom') {
@@ -824,11 +818,9 @@ function renderQuestions() {
   }
   list.innerHTML = store.questions.map((q, i) => {
     const typeLabel = q.type === 'rating' ? '⭐ Rating Scale (1–5)' : q.type === 'open' ? '📝 Open-ended' : '🔘 Custom Choices';
-    const catBadge = q.category ? `<span style="font-size:0.72rem;font-weight:700;color:var(--blue-mid);background:var(--blue-light);padding:2px 8px;border-radius:12px;margin-right:6px">${q.category}</span>` : '';
     return `<div class="question-item">
       <div class="question-num">${i + 1}</div>
       <div class="question-body">
-        <div style="margin-bottom:5px">${catBadge}</div>
         <div class="question-text">${q.text}</div>
         <div class="question-type">${typeLabel}</div>
       </div>
@@ -1076,29 +1068,11 @@ function renderReportComparison() {
       const pct = cnt ? Math.round((tot / cnt / 5) * 100) : null;
       return `<td style="text-align:center"><span style="color:${scoreColor(pct)};font-weight:700">${avg}</span><br><span style="font-size:0.72rem;color:var(--text3)">${pct}%</span></td>`;
     }).join('');
-    const label = q.category || (q.text.length > 70 ? q.text.substring(0,70)+'...' : q.text);
-    return `<tr><td style="font-size:0.82rem;max-width:260px"><strong style="color:var(--blue)">${label}</strong><br><span style="color:var(--text3);font-size:0.75rem">${q.text.length > 60 ? q.text.substring(0,60)+'...' : q.text}</span></td>${cells}</tr>`;
+    return `<tr><td style="font-size:0.82rem;max-width:260px">${q.text.length > 70 ? q.text.substring(0,70)+'...' : q.text}</td>${cells}</tr>`;
   }).join('');
   const headers = leadsWithData.map(l => `<th style="text-align:center;min-width:90px">${l.name.split(' ')[0]}</th>`).join('');
-  // Bar chart
-  const chartHtml = `<div class="card" style="margin-bottom:1rem">
-    <div class="card-title">Overall Score Comparison</div>
-    ${leadsWithData.map(lead => {
-      const score = calcLeadScore(lead.id);
-      if (score === null) return '';
-      return `<div style="display:flex;align-items:center;gap:12px;margin-bottom:10px">
-        <div style="width:130px;text-align:right;font-size:0.85rem;font-weight:600;color:var(--text2);overflow:hidden;text-overflow:ellipsis;white-space:nowrap" title="${lead.name}">${lead.name.split(' ')[0]}</div>
-        <div style="flex:1;height:26px;background:var(--border);border-radius:6px;overflow:hidden">
-          <div style="width:${score}%;height:100%;background:${scoreColor(score)};border-radius:6px;display:flex;align-items:center;padding-left:8px;transition:width .5s ease">
-            <span style="font-size:0.75rem;font-weight:700;color:#fff">${score}%</span>
-          </div>
-        </div>
-        <div style="width:80px;font-size:0.78rem;color:var(--text3)">${scoreLabel(score)}</div>
-      </div>`;
-    }).join('')}
-  </div>`;
-  el.innerHTML = chartHtml + `<div class="card"><div class="table-wrap"><table>
-    <thead><tr><th>Dimension</th>${headers}</tr></thead>
+  el.innerHTML = `<div class="card"><div class="table-wrap"><table>
+    <thead><tr><th>Question</th>${headers}</tr></thead>
     <tbody>${rows}</tbody>
   </table></div></div>`;
 }
@@ -1116,7 +1090,7 @@ function renderReportDetail() {
       if (s === null) return '';
       return `<div style="margin-bottom:10px">
         <div style="display:flex;justify-content:space-between;font-size:0.82rem;margin-bottom:4px">
-          <span style="color:var(--text2)">${q.category || (q.text.length > 55 ? q.text.substring(0,55)+'...' : q.text)}</span>
+          <span style="color:var(--text2)">${q.text.length > 55 ? q.text.substring(0,55)+'...' : q.text}</span>
           <span style="font-weight:700;color:${scoreColor(s)}">${s}%</span>
         </div>
         <div class="progress-bar"><div class="progress-fill ${fillClass(s)}" style="width:${s}%"></div></div>
@@ -1130,35 +1104,6 @@ function renderReportDetail() {
         ${answers.map(a => `<div style="background:var(--blue-light);border:1px solid var(--border);border-radius:6px;padding:8px 12px;font-size:0.85rem;margin-bottom:6px;color:var(--text)">${a}</div>`).join('')}
       </div>`;
     }).join('');
-    // Per-assessor responses table
-    const assessorRowsHtml = responses.length ? `
-      <div style="margin-top:1.5rem;padding-top:1rem;border-top:1px solid var(--border)">
-        <div class="card-title">Per-Assessor Scores</div>
-        <div class="table-wrap"><table>
-          <thead><tr><th>Assessor</th><th>Position</th><th>Date</th>
-            ${ratingQs.map(q => `<th style="text-align:center;min-width:60px;font-size:0.68rem">${(q.category||q.text).substring(0,18)}…</th>`).join('')}
-            <th style="text-align:center">Score</th>
-          </tr></thead>
-          <tbody>
-            ${responses.map(r => {
-              let tot = 0, cnt = 0;
-              const cells = ratingQs.map(q => {
-                const v = r.answers[q.id];
-                if (v !== undefined) { tot += Number(v); cnt++; }
-                return `<td style="text-align:center;font-weight:600;color:${v ? scoreColor(Math.round(Number(v)/5*100)) : 'var(--text3)'}">${v || '—'}</td>`;
-              }).join('');
-              const rPct = cnt ? Math.round((tot / (cnt * 5)) * 100) : null;
-              return `<tr>
-                <td><strong>${r.assessorName}</strong></td>
-                <td><span class="badge badge-gray">${r.assessorPosition}</span></td>
-                <td style="font-size:0.78rem;color:var(--text3)">${new Date(r.submittedAt).toLocaleDateString()}</td>
-                ${cells}
-                <td style="text-align:center"><span style="font-weight:800;color:${rPct ? scoreColor(rPct) : 'var(--text3)'}">${rPct !== null ? rPct+'%' : '—'}</span></td>
-              </tr>`;
-            }).join('')}
-          </tbody>
-        </table></div>
-      </div>` : '';
     return `<div class="card" style="margin-bottom:1.5rem">
       <div style="display:flex;align-items:center;gap:1rem;margin-bottom:1.5rem;padding-bottom:1rem;border-bottom:2px solid var(--yellow)">
         <div class="lead-avatar">${initials(lead.name)}</div>
@@ -1181,7 +1126,6 @@ function renderReportDetail() {
           ${openResponsesHtml || '<p style="color:var(--text3);font-size:0.85rem">No open responses yet.</p>'}
         </div>
       </div>
-      ${assessorRowsHtml}
       ${responses.length ? `<div style="margin-top:1rem;padding-top:1rem;border-top:1px solid var(--border)">
         <div class="card-title">Assessor List</div>
         <div style="display:flex;gap:6px;flex-wrap:wrap">
@@ -1220,9 +1164,6 @@ function checkSurveyRoute() {
   document.getElementById('survey-header-title').textContent = `QA Lead Evaluation: ${lead.name}`;
   document.getElementById('survey-header-sub').textContent = `Assessor: ${sv.assessorName} · ${sv.assessorPosition} · CP Axtra`;
   const questionsHtml = store.questions.map((q, i) => {
-    const catLabel = q.category && q.category !== q.text.substring(0,40)
-      ? `<div style="font-size:0.72rem;font-weight:700;color:var(--blue-mid);text-transform:uppercase;letter-spacing:0.07em;background:var(--blue-light);padding:3px 10px;border-radius:20px;display:inline-block;margin-bottom:10px">${q.category}</div>`
-      : '';
     if (q.type === 'rating' || q.type === 'custom') {
       const opts = q.choices.map(c => `
         <label class="radio-option" onclick="selectOption(this)">
@@ -1231,14 +1172,12 @@ function checkSurveyRoute() {
         </label>`).join('');
       return `<div class="survey-q-card">
         <div class="survey-q-num">Question ${i + 1} · ${q.type === 'rating' ? 'Rating' : 'Choice'}</div>
-        ${catLabel}
         <div class="survey-q-text">${q.text}</div>
         <div class="radio-group" id="qg_${q.id}">${opts}</div>
       </div>`;
     } else {
       return `<div class="survey-q-card">
         <div class="survey-q-num">Question ${i + 1} · Open-ended (Optional)</div>
-        ${catLabel}
         <div class="survey-q-text">${q.text}</div>
         <textarea class="open-textarea" id="open_${q.id}" placeholder="Type your response here..."></textarea>
       </div>`;
